@@ -6,6 +6,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 
 class ComplaintsScreen extends StatefulWidget {
+  const ComplaintsScreen({super.key});
+
   @override
   _ComplaintsScreenState createState() => _ComplaintsScreenState();
 }
