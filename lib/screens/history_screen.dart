@@ -112,27 +112,26 @@ Future<void> _loadHistoryData() async {
                     ),
                   ),
                  DropdownButton<String>(
-  value: _selectedTechnology.isNotEmpty &&
-          ['4G', 'WiFi', '3G'].contains(_selectedTechnology)
-      ? _selectedTechnology
-      : '4G', // Fallback to a default value
-  onChanged: (String? newValue) {
-    setState(() {
-      _selectedTechnology = newValue!;
-    });
-    _loadHistoryData(); // Call the method to fetch data based on the new selection
-  },
-  items: ['4G', 'WiFi', '3G'].map((String value) {
-    return DropdownMenuItem<String>(
-      value: value,
-      child: Text(
-        value,
-        style: const TextStyle(fontSize: 16),
-      ),
-    );
-  }).toList(),
-),
-
+                    value: _selectedTechnology.isNotEmpty &&
+                            ['4G', 'WiFi', '3G'].contains(_selectedTechnology)
+                        ? _selectedTechnology
+                        : '4G', // Fallback to a default value
+                    onChanged: (String? newValue) {
+                      setState(() {
+                        _selectedTechnology = newValue!;
+                      });
+                      _loadHistoryData(); // Call the method to fetch data based on the new selection
+                    },
+                    items: ['4G', 'WiFi', '3G'].map((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(
+                          value,
+                          style: const TextStyle(fontSize: 16),
+                        ),
+                      );
+                    }).toList(),
+                  ),
                 ],
               ),
               const SizedBox(height: 16.0),
@@ -141,11 +140,29 @@ Future<void> _loadHistoryData() async {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  _buildStatCard('Total tests taken', _totalTests.toString(), Icons.check_circle),
-                  _buildStatCard('Download Avg', '${_downloadAvg.toStringAsFixed(2)} Mbps',
-                      Icons.download),
-                  _buildStatCard('Signal Avg', '${_signalAvg.toStringAsFixed(2)} Mbps',
-                      Icons.signal_cellular_alt),
+                  Expanded(
+                    child: _buildStatCard(
+                      'Total tests',
+                      _totalTests.toString(),
+                      Icons.check_circle,
+                    ),
+                  ),
+                  SizedBox(width: 8), // Ajout d'un espacement entre les cartes
+                  Expanded(
+                    child: _buildStatCard(
+                      'Download Avg',
+                      '${_downloadAvg.toStringAsFixed(2)} Mbps',
+                      Icons.download,
+                    ),
+                  ),
+                  SizedBox(width: 8), // Ajout d'un espacement entre les cartes
+                  Expanded(
+                    child: _buildStatCard(
+                      'Signal Avg',
+                      '${_signalAvg.toStringAsFixed(2)} Mbps',
+                      Icons.signal_cellular_alt,
+                    ),
+                  ),
                 ],
               ),
               const SizedBox(height: 16.0),
@@ -211,7 +228,7 @@ Future<void> _loadHistoryData() async {
                       Text(
                         item['date'],
                         style: const TextStyle(
-                          fontSize: 16,
+                          fontSize: 14,
                           fontWeight: FontWeight.bold,
                           color: Colors.black,
                         ),
@@ -222,7 +239,7 @@ Future<void> _loadHistoryData() async {
                           const Text(
                             'Download: ',
                             style: TextStyle(
-                              fontSize: 14,
+                              fontSize: 12,
                               fontWeight: FontWeight.bold,
                               color: Colors.grey,
                             ),
@@ -230,7 +247,7 @@ Future<void> _loadHistoryData() async {
                           Text(
                             '${item['download']} Mbps',
                             style: const TextStyle(
-                              fontSize: 14,
+                              fontSize: 12,
                               fontWeight: FontWeight.bold,
                               color: Colors.black,
                             ),
@@ -252,7 +269,7 @@ Future<void> _loadHistoryData() async {
                   ),
                   const SizedBox(width: 4.0),
                   Text(
-                    '${item['signal']} Mbps',
+                    '${item['signal']}',
                     style: const TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.bold,

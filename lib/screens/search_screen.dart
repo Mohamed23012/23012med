@@ -250,13 +250,13 @@ class _SearchScreenState extends State<SearchScreen> {
               '$operatorName\n',
               const TextStyle(
                 fontWeight: FontWeight.bold,
-                fontSize: 14,
+                fontSize: 8,
                 color: Colors.white,
               ),
               children: [
                 TextSpan(
                   text: '${rod.toY.toStringAsFixed(2)}%',
-                  style: const TextStyle(fontSize: 12, color: Colors.white),
+                  style: const TextStyle(fontSize: 10, color: Colors.white),
                 ),
               ],
             );
