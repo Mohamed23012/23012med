@@ -65,7 +65,7 @@ class _SearchScreenState extends State<SearchScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[100],
+      backgroundColor: Colors.grey[200],
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(16.0),

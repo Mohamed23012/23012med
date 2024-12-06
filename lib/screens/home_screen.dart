@@ -47,7 +47,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: Colors.grey[200],
         elevation: 0,
         title: const Text(
           'QUALITY NET',
@@ -67,7 +67,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
-      backgroundColor: const Color(0xFFF5F5F5),
+      backgroundColor: Colors.grey[200],
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: isTesting

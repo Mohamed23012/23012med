@@ -92,7 +92,7 @@ Future<void> _loadHistoryData() async {
         .toList();
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F5), // Light grey background
+      backgroundColor: Colors.grey[200], // Light grey background
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(16.0),

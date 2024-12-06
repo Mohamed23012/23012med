@@ -15,7 +15,7 @@ class GoogleBottomBar extends StatefulWidget {
 class _GoogleBottomBarState extends State<GoogleBottomBar> {
   int _selectedIndex = 0;
 
-  // Define the list of screens corresponding to each tab.
+
   final List<Widget> _screens = [
     const HomeScreen(key: PageStorageKey('HomeScreen')),
     const ComplaintsScreen(key: PageStorageKey('ComplaintsScreen')),
@@ -26,56 +26,69 @@ class _GoogleBottomBarState extends State<GoogleBottomBar> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: IndexedStack(
-        index: _selectedIndex,
-        children: _screens, // Show the selected screen
-      ),
-      bottomNavigationBar: Container(
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(20),
-            topRight: Radius.circular(20),
+      backgroundColor: Colors.grey[200],
+      body: _screens[_selectedIndex],
+      bottomNavigationBar: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+            child: Theme(
+              data: Theme.of(context).copyWith(
+                splashFactory: NoSplash.splashFactory,
+                highlightColor: Colors.transparent,
+              ),
+              child: Container(
+                height: 70,
+                clipBehavior: Clip.antiAlias,
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.all(Radius.circular(40)),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black12,
+                      blurRadius: 5,
+                      spreadRadius: 1,
+                    ),
+                  ],
+                ),
+                child: BottomNavigationBar(
+                  iconSize: 26,
+                  selectedFontSize: 14,
+                  currentIndex: _selectedIndex,
+                  onTap: (index) {
+                    setState(() {
+                      _selectedIndex = index;
+                    });
+                  },
+                  type: BottomNavigationBarType.fixed, 
+                  backgroundColor: Colors.transparent,
+                  selectedItemColor: Colors.blue,
+                  unselectedItemColor: Colors.grey,
+                  elevation: 0, // Remove BottomNavigationBar shadow
+                  items: const [
+                    BottomNavigationBarItem(
+                      icon: Icon(Icons.speed),
+                      label: "Speed",
+                    ),
+                    BottomNavigationBarItem(
+                      icon: Icon(Icons.feedback),
+                      label: "Plaints",
+                    ),
+                    BottomNavigationBarItem(
+                      icon: Icon(Icons.history),
+                      label: "History",
+                    ),
+                    BottomNavigationBarItem(
+                      icon: Icon(Icons.star),
+                      label: "Search",
+                    ),
+                  ],
+                ),
+              ),
+            ),
           ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black12,
-              blurRadius: 5,
-              spreadRadius: 1,
-            ),
-          ],
-        ),
-        child: BottomNavigationBar(
-          currentIndex: _selectedIndex,
-          onTap: (index) {
-            setState(() {
-              _selectedIndex = index; // Update the selected index
-            });
-          },
-          type: BottomNavigationBarType.fixed, // Ensures a consistent layout
-          backgroundColor: Colors.transparent, // Background already handled
-          selectedItemColor: Colors.blue, // Highlight selected item
-          unselectedItemColor: Colors.grey, // Dim unselected items
-          elevation: 0, // Remove BottomNavigationBar shadow
-          items: const [
-            BottomNavigationBarItem(
-              icon: Icon(Icons.speed),
-              label: "Speed",
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.feedback),
-              label: "Plaints",
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.history),
-              label: "History",
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.star), // Changed icon to Star
-              label: "Search",
-            ),
-          ],
-        ),
+        ],
       ),
     );
   }
