@@ -35,6 +35,7 @@ class _SearchScreenState extends State<SearchScreen> {
         body: jsonEncode({
           'technology': _selectedTechnology,
           'indicator': indicatorMapping[_selectedIndicator]!,
+          
         }),
       );
 
@@ -158,14 +159,14 @@ class _SearchScreenState extends State<SearchScreen> {
 
               // Location Section
               const SizedBox(height: 24),
-              Row(
+              const Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Icon(Icons.location_on, color: Colors.blue),
-                  const SizedBox(width: 8),
+                  Icon(Icons.location_on, color: Colors.blue),
+                  SizedBox(width: 8),
                   Text(
                     'Tevrek Zeyna - Soukouk', // Replace with your location
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
                     ),
@@ -299,10 +300,10 @@ class _SearchScreenState extends State<SearchScreen> {
       },
     ),
   ),
-  topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-  rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+  topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+  rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
 ),
-      gridData: FlGridData(show: true),
+      gridData: const FlGridData(show: true),
       borderData: FlBorderData(show: false),
       barGroups: barGroups,
       alignment: BarChartAlignment.spaceAround,

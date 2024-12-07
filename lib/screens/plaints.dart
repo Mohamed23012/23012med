@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:internet/services/network_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -20,17 +19,17 @@ class _ComplaintsScreenState extends State<ComplaintsScreen> {
   @override
   void initState() {
     super.initState();
-    _loadComplaints(); // Charger les plaintes sauvegardées au démarrage
+    _loadComplaints(); // Load saved complaints on startup
   }
 
-  // Sauvegarder les plaintes dans SharedPreferences
+  // Save complaints to SharedPreferences
   Future<void> _saveComplaints() async {
     final prefs = await SharedPreferences.getInstance();
-    final complaintsJson = jsonEncode(_complaints); // Convertir en JSON
-    await prefs.setString('complaints', complaintsJson); // Sauvegarder
+    final complaintsJson = jsonEncode(_complaints); // Convert to JSON
+    await prefs.setString('complaints', complaintsJson); // Save
   }
 
-  // Charger les plaintes sauvegardées depuis SharedPreferences
+  // Load saved complaints from SharedPreferences
   Future<void> _loadComplaints() async {
     final prefs = await SharedPreferences.getInstance();
     final complaintsJson = prefs.getString('complaints');
@@ -38,59 +37,56 @@ class _ComplaintsScreenState extends State<ComplaintsScreen> {
       final loadedComplaints =
           List<Map<String, dynamic>>.from(jsonDecode(complaintsJson));
       setState(() {
-        _complaints.addAll(loadedComplaints); // Ajouter les plaintes chargées
+        _complaints.addAll(loadedComplaints); // Add loaded complaints
       });
     }
   }
 
- void _submitComplaint() async {
-  if (_currentRating > 0 || _complaintController.text.isNotEmpty) {
-    // Show a loading indicator while the data is being stored
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (context) => const Center(
-        child: CircularProgressIndicator(),
-      ),
-    );
-
-    // Add the complaint to local storage
-    setState(() {
-      _complaints.add({
-        'date': DateTime.now().toIso8601String(),
-        'rating': _currentRating,
-        'complaint': _complaintController.text,
-      });
-      _complaintController.clear();
-      _currentRating = 0.0;
-    });
-
-    // Save the complaints locally
-    await _saveComplaints();
-    final networkProvider = Provider.of<NetworkProvider>(context, listen: false);
-
-    // Prepare and store data to the backend
-    try {
-       networkProvider.storeData();// Call your storeData function
-      Navigator.pop(context); // Close the loading dialog
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Complaint submitted successfully!")),
+  void _submitComplaint() async {
+    if (_currentRating > 0 || _complaintController.text.isNotEmpty) {
+      // Show a loading indicator while data is being stored
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (context) => const Center(
+          child: CircularProgressIndicator(),
+        ),
       );
-    } catch (e) {
-      Navigator.pop(context); // Close the loading dialog
+
+      // Add the complaint to local storage
+      setState(() {
+        _complaints.add({
+          'date': DateTime.now().toIso8601String(),
+          'rating': _currentRating,
+          'complaint': _complaintController.text,
+        });
+        _complaintController.clear();
+        _currentRating = 0.0;
+      });
+
+      // Save the complaints locally
+      await _saveComplaints();
+      final networkProvider = Provider.of<NetworkProvider>(context, listen: false);
+
+      // Prepare and store data to the backend
+      try {
+        networkProvider.storeData(); // Call your storeData function
+        Navigator.pop(context); // Close the loading dialog
+      } catch (e) {
+        Navigator.pop(context); // Close the loading dialog
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Failed to submit complaint: $e")),
+        );
+      }
+    } else {
+      // Show an error if the rating or complaint is empty
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Failed to submit complaint: $e")),
+        const SnackBar(
+          content: Text("Please provide a rating and enter your complaint."),
+        ),
       );
     }
-  } else {
-    // Show an error if the rating or complaint is empty
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text("Please provide a rating and enter your complaint."),
-      ),
-    );
   }
-}
 
   String _formatDateTime(String dateTimeString) {
     final dateTime = DateTime.parse(dateTimeString);
@@ -115,9 +111,38 @@ class _ComplaintsScreenState extends State<ComplaintsScreen> {
     );
   }
 
+  Widget _buildStars() {
+  return Row(
+    mainAxisAlignment: MainAxisAlignment.center,
+    children: List.generate(5, (index) {
+      return IconButton(
+        icon: Icon(
+          index < _currentRating
+              ? Icons.star
+              : Icons.star_border, // Étoile pleine ou vide
+          color: Colors.amber,
+          size: 50,
+        ),
+        onPressed: () {
+          setState(() {
+            if (_currentRating == index + 1) {
+              _currentRating = index.toDouble();
+            } else {
+              _currentRating = index + 1.0;
+            }
+          });
+        },
+        highlightColor: Colors.transparent, // Désactiver la couleur du surlignage
+      );
+    }),
+  );
+}
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.grey[200],
       appBar: AppBar(
         title: const Text("PLAINTS"),
         actions: [
@@ -137,38 +162,22 @@ class _ComplaintsScreenState extends State<ComplaintsScreen> {
             // Rating Section
             Column(
               children: [
-                RatingBar.builder(
-                  initialRating: _currentRating,
-                  minRating: 0.5,
-                  direction: Axis.horizontal,
-                  allowHalfRating: true,
-                  itemCount: 5,
-                  itemPadding: const EdgeInsets.symmetric(horizontal: 8.0),
-                  itemBuilder: (context, _) => const Icon(
-                    Icons.star,
-                    color: Colors.amber,
-                  ),
-                  onRatingUpdate: (rating) {
-                    setState(() {
-                      _currentRating = rating;
-                    });
-                  },
-                ),
+                _buildStars(),
                 const SizedBox(height: 8),
                 const Text(
                   "Rate your experience, it is important for us",
-                  style: TextStyle(fontSize: 16, color: Colors.grey),
+                  style: TextStyle(fontSize: 16),
                   textAlign: TextAlign.center,
                 ),
               ],
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 10),
 
             // Complaint Input
             TextField(
               controller: _complaintController,
               decoration: InputDecoration(
-                labelText: "Your plaint",
+                labelText: "",
                 labelStyle: const TextStyle(
                   color: Colors.blue,
                 ),
@@ -187,7 +196,7 @@ class _ComplaintsScreenState extends State<ComplaintsScreen> {
                   ),
                 ),
               ),
-              maxLines: 1,
+              maxLines: 2,
             ),
 
             const SizedBox(height: 16),
@@ -204,21 +213,21 @@ class _ComplaintsScreenState extends State<ComplaintsScreen> {
                 ),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.blue,
-                  minimumSize: const Size(100, 50),
+                  minimumSize: const Size(60, 50),
                 ),
               ),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 10),
 
             // Complaints History Title
             const Text(
               "Historique",
               style: TextStyle(
-                fontSize: 24,
+                fontSize: 20,
                 fontWeight: FontWeight.bold,
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 1),
 
             // Complaints History Table
             Expanded(
@@ -247,21 +256,18 @@ class _ComplaintsScreenState extends State<ComplaintsScreen> {
                                   "Date",
                                   style: TextStyle(
                                     fontWeight: FontWeight.bold,
-                                    fontSize: 18,
+                                    fontSize: 16,
                                   ),
                                   textAlign: TextAlign.center,
                                 ),
                               ),
                               Expanded(
                                 flex: 2,
-                                child: Text(
-                                  "Rating",
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 18,
+                                child:
+                                  const Icon(
+                                    Icons.star,
+                                    color: Colors.amber,
                                   ),
-                                  textAlign: TextAlign.center,
-                                ),
                               ),
                               Expanded(
                                 flex: 3,
@@ -269,7 +275,7 @@ class _ComplaintsScreenState extends State<ComplaintsScreen> {
                                   "Details",
                                   style: TextStyle(
                                     fontWeight: FontWeight.bold,
-                                    fontSize: 18,
+                                    fontSize: 16,
                                   ),
                                   textAlign: TextAlign.center,
                                 ),
@@ -278,10 +284,15 @@ class _ComplaintsScreenState extends State<ComplaintsScreen> {
                           ),
                         ),
                         Expanded(
-                          child: ListView.builder(
-                            itemCount: _complaints.length,
+                          child: ListView.separated(
+                            itemCount: _complaints.length > 5 ? 5 : _complaints.length,
+                            separatorBuilder: (context, index) => const Divider(
+                              color: Colors.black12,
+                              thickness: 1,
+                              height: 3,
+                            ),
                             itemBuilder: (context, index) {
-                              final complaint = _complaints[index];
+                              final complaint = _complaints[_complaints.length - index - 1];
                               return Container(
                                 padding: const EdgeInsets.symmetric(
                                   vertical: 8.0,
@@ -302,16 +313,14 @@ class _ComplaintsScreenState extends State<ComplaintsScreen> {
                                         mainAxisAlignment:
                                             MainAxisAlignment.center,
                                         children: [
+                                          
+                                          const SizedBox(width: 4),
                                           Text(
-                                            complaint['rating'].toString(),
+                                            complaint['rating'].toInt().toString(),
                                             style: const TextStyle(
                                               fontSize: 14,
+                                              fontWeight: FontWeight.bold,
                                             ),
-                                          ),
-                                          const SizedBox(width: 4),
-                                          const Icon(
-                                            Icons.star,
-                                            color: Colors.amber,
                                           ),
                                         ],
                                       ),
@@ -328,6 +337,7 @@ class _ComplaintsScreenState extends State<ComplaintsScreen> {
                                           style: const TextStyle(
                                             fontSize: 14,
                                           ),
+                                          textAlign: TextAlign.center,
                                         ),
                                       ),
                                     ),

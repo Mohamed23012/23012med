@@ -32,7 +32,7 @@ class _GoogleBottomBarState extends State<GoogleBottomBar> {
         mainAxisSize: MainAxisSize.min,
         children: [
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 2),
             child: Theme(
               data: Theme.of(context).copyWith(
                 splashFactory: NoSplash.splashFactory,
