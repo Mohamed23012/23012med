@@ -339,6 +339,7 @@ class _HomeScreenState extends State<HomeScreen> {
       ElevatedButton(
         onPressed: () {
           // Add logic to stop the test here
+          final networkProvider = Provider.of<NetworkProvider>(context, listen: false);
           networkProvider.stopTest();
 
           setState(() {
@@ -352,13 +353,25 @@ class _HomeScreenState extends State<HomeScreen> {
             borderRadius: BorderRadius.circular(12),
           ),
         ),
-        child: const Text(
-          'STOP TEST',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-          ),
+        child: const Row(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.warning, // Danger icon
+              color: Colors.white,
+              size: 20, // Adjust the size if necessary
+            ),
+            SizedBox(width: 8), // Add some space between the icon and the text
+            Text(
+              'STOP TEST',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
         ),
       ),
     ],

@@ -57,7 +57,13 @@ class NetworkProvider with ChangeNotifier {
   String? get location => _location;
   String? get signalStrengthValue => _signalStrengthValue;
   String? get wifiName => _wifiName;
+
+  bool _isCancelled = false;
+  
   Future<void> startTest() async {
+    if (isTesting) return;
+
+    isTesting = true;
     Completer<void> testCompleter = Completer<void>();
 
     await speedTest.startTesting(
@@ -74,6 +80,7 @@ class NetworkProvider with ChangeNotifier {
         _downloadSpeed = download.transferRate;
         _uploadSpeed = upload.transferRate;
 
+        isTesting = false;
         if (!testCompleter.isCompleted) {
           testCompleter.complete();
         }
@@ -106,6 +113,9 @@ class NetworkProvider with ChangeNotifier {
         notifyListeners();
       },
       onCancel: () {
+        print("Test canceled");
+
+        isTesting = false;
         if (!testCompleter.isCompleted) {
           testCompleter.complete();
         }
@@ -114,23 +124,25 @@ class NetworkProvider with ChangeNotifier {
     );
 
     await testCompleter.future;
-
-    // Store the data after the test is completed
   }
 
   void stopTest() {
-    // Reset the testing flag
-    isTesting = false;
+    if (isTesting) {
+      speedTest.cancelTest(); // Annule le test en cours
+      _isCancelled = true;
+      isTesting = false;
+    }
 
-    // Reset all test-related variables if needed
+    // Réinitialiser les variables de test si nécessaire
     _downloadSpeed = 0;
     _uploadSpeed = 0;
     _ping = 0;
     _jitter = 0;
     _packetLoss = 0;
 
-    notifyListeners(); // Notify listeners to update the UI
+    notifyListeners(); // Mettre à jour l'interface utilisateur
   }
+
 
   Future<void> networkmetrics() async {
     final ping = Ping('8.8.8.8', count: 4); // Pinging Google's DNS server
@@ -160,6 +172,12 @@ class NetworkProvider with ChangeNotifier {
 
 
   Future<void> storeData() async {
+    if (_isCancelled) {
+      print("Test annulé - données non enregistrées.");
+      _isCancelled = false;
+      return;
+    }
+
     final prefs = await SharedPreferences.getInstance();
     // Obtenir depuis SharedPreferences
 
@@ -208,14 +226,13 @@ class NetworkProvider with ChangeNotifier {
         'http://104.154.91.24:8000/api/insert_data/'); // Replace with your endpoint
     try {
      final response = await http.post(
-  url,
-  headers: {
-    'Content-Type': 'application/json',
-   
-  },
-  body: jsonEncode(data),
-);
-
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+        
+        },
+        body: jsonEncode(data),
+      );
 
       if (response.statusCode == 201) {
         print('Data inserted successfully: ${response.body}');
