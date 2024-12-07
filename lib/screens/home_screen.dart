@@ -39,6 +39,8 @@ class _HomeScreenState extends State<HomeScreen> {
         isLoading = false; // Still stop loading even if there's an error
       });
     }
+
+    
   }
 
   @override
@@ -98,12 +100,27 @@ class _HomeScreenState extends State<HomeScreen> {
         Stack(
           alignment: Alignment.center,
           children: [
-            NetworkGauge(
-              downloadValue: networkProvider.downloadSpeed,
-              uploadValue: networkProvider.uploadSpeed,
-              downloadColor: const Color(0xFF1E88E5),
-              uploadColor: const Color(0xFF4CAF50),
-              backgroundColor: Colors.grey[300]!,
+            SizedBox(
+              width: 300,
+              height: 300,
+              child: SfRadialGauge(
+                axes: <RadialAxis>[
+                  RadialAxis(
+                    startAngle: 130,
+                    endAngle: 50,
+                    minimum: 0,
+                    maximum: 100,
+                    showLabels: false,
+                    showTicks: false,
+                    axisLineStyle: AxisLineStyle(
+                      thickness: 0.15,
+                      cornerStyle: CornerStyle.bothCurve,
+                      color: Colors.grey[300]!,
+                      thicknessUnit: GaugeSizeUnit.factor,
+                    ),
+                  ),
+                ],
+              ),
             ),
             ElevatedButton(
               onPressed: () async {
@@ -198,127 +215,155 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildTestingLayout(NetworkProvider networkProvider) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        // Upload and Download Speeds
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            _buildSpeedInfo('Upload', networkProvider.uploadSpeed.toStringAsFixed(1), Icons.cloud_upload),
-            _buildSpeedInfo('Download', networkProvider.downloadSpeed.toStringAsFixed(1), Icons.cloud_download),
-          ],
-        ),
-        const SizedBox(height: 20),
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.center,
+    children: [
+      // Upload and Download Speeds
+      Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          _buildSpeedInfo(
+            'Download',
+            networkProvider.downloadSpeed.toStringAsFixed(1),
+            Icons.cloud_download,
+          ),
+          _buildSpeedInfo(
+            'Signal',
+            '${networkProvider.signalStrengthValue}',
+            Icons.network_check,
+          ),
+        ],
+      ),
+      const SizedBox(height: 20),
 
-        // Ping, Jitter, and Mbps
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            _buildSpeedInfo('Ping', '${networkProvider.ping.toStringAsFixed(1)} ms', Icons.timer),
-            _buildSpeedInfo('Jitter', '${networkProvider.jitter.toStringAsFixed(1)} ms', Icons.speed),
-            _buildSpeedInfo('Signal', '${networkProvider.signalStrengthValue}', Icons.network_check),
-          ],
-        ),
-        const SizedBox(height: 30),
+      // Ping, Jitter, and Mbps
+      Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          _buildSpeedInfo(
+            'Ping',
+            '${networkProvider.ping.toStringAsFixed(1)} ms',
+            Icons.timer,
+          ),
+          _buildSpeedInfo(
+            'Jitter',
+            '${networkProvider.jitter.toStringAsFixed(1)} ms',
+            Icons.speed,
+          ),
+          _buildSpeedInfo(
+            'Upload',
+            networkProvider.uploadSpeed.toStringAsFixed(1),
+            Icons.cloud_upload,
+          ),
+        ],
+      ),
+      const SizedBox(height: 20),
 
-        // Circular Gauge
-        Stack(
-          alignment: Alignment.center,
-          children: [
-            SizedBox(
-              width: 200,
-              height: 200,
-              child: SfRadialGauge(
-                axes: <RadialAxis>[
-                  RadialAxis(
-                    startAngle: 180,
-                    endAngle: 0,
-                    minimum: 0,
-                    maximum: 200,
-                    showLabels: false,
-                    showTicks: false,
-                    axisLineStyle: AxisLineStyle(
-                      thickness: 0.15,
-                      cornerStyle: CornerStyle.bothCurve,
-                      color: Colors.grey[300]!,
-                      thicknessUnit: GaugeSizeUnit.factor,
-                    ),
-                    pointers: <GaugePointer>[
-                      RangePointer(
-                        value: networkProvider.downloadSpeed,
-                        cornerStyle: CornerStyle.bothCurve,
-                        width: 0.15,
-                        sizeUnit: GaugeSizeUnit.factor,
-                        color: Colors.green,
-                      ),
-                    ],
-                  ),
-                ],
+      // Circular Gauge
+      Stack(
+        alignment: Alignment.center,
+        children: [
+          SizedBox(
+            width: 200,
+            height: 200,
+            child:
+              NetworkGauge(
+                downloadValue: networkProvider.downloadSpeed,
+                uploadValue: networkProvider.uploadSpeed,
+                downloadColor: const Color(0xFF4CAF50),
+                uploadColor: const Color(0xFF1E88E5),
+                backgroundColor: Colors.grey[300]!,
               ),
-            ),
-            Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Text(
-                  'Download',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.grey,
-                  ),
+          ),
+          Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Text(
+                'Download',
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.grey,
                 ),
-                const SizedBox(height: 8),
-                Text(
-                  '${networkProvider.downloadSpeed.toStringAsFixed(1)} Mbps',
-                  style: const TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.green,
-                  ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                '${networkProvider.downloadSpeed.toStringAsFixed(1)} Mbps',
+                style: const TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.green,
                 ),
-              ],
-            ),
-          ],
-        ),
-        const SizedBox(height: 30),
+              ),
+            ],
+          ),
+        ],
+      ),
+      const SizedBox(height: 15),
 
-        // Network Informations Section
-        const Text(
-          'Network Informations',
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            color: Colors.black,
+      // Network Informations Section
+      const Text(
+        'Network Informations',
+        style: TextStyle(
+          fontSize: 16,
+          fontWeight: FontWeight.bold,
+          color: Colors.black,
+        ),
+      ),
+      const SizedBox(height: 10),
+      Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          _buildNetworkInfoCard(
+            icon: networkProvider.networkType == networkProvider.wifiName
+                ? Icons.wifi
+                : Icons.speaker_phone,
+            label: 'Technologie',
+            value: networkProvider.networkType ?? 'Unknown',
+          ),
+          _buildNetworkInfoCard(
+            icon: Icons.business,
+            label: 'Opérateur',
+            value: networkProvider.operator ?? 'Unknown',
+          ),
+          _buildNetworkInfoCard(
+            icon: Icons.location_on,
+            label: 'Location',
+            value: networkProvider.location ?? 'Unknown',
+          ),
+        ],
+      ),
+      const SizedBox(height: 15),
+
+      // Stop Test Button
+      ElevatedButton(
+        onPressed: () {
+          // Add logic to stop the test here
+          networkProvider.stopTest();
+
+          setState(() {
+            isTesting = false;
+          });
+        },
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.red, // Button color
+          padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
           ),
         ),
-        const SizedBox(height: 10),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            _buildNetworkInfoCard(
-              icon: networkProvider.networkType ==
-                            networkProvider.wifiName
-                        ? Icons.wifi
-                        : Icons.speaker_phone,
-              label: 'Technologie',
-              value: networkProvider.networkType ?? 'Unknown',
-            ),
-            _buildNetworkInfoCard(
-              icon: Icons.business,
-              label: 'Opérateur',
-              value: networkProvider.operator ?? 'Unknown',
-            ),
-            _buildNetworkInfoCard(
-              icon: Icons.location_on,
-              label: 'Location',
-              value: networkProvider.location ?? 'Unknown',
-            ),
-          ],
+        child: const Text(
+          'STOP TEST',
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+          ),
         ),
-      ],
-    );
-  }
+      ),
+    ],
+  );
+}
 
   Widget _buildNetworkInfoCard({
     required IconData icon,

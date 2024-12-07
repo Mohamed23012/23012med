@@ -118,6 +118,20 @@ class NetworkProvider with ChangeNotifier {
     // Store the data after the test is completed
   }
 
+  void stopTest() {
+    // Reset the testing flag
+    isTesting = false;
+
+    // Reset all test-related variables if needed
+    _downloadSpeed = 0;
+    _uploadSpeed = 0;
+    _ping = 0;
+    _jitter = 0;
+    _packetLoss = 0;
+
+    notifyListeners(); // Notify listeners to update the UI
+  }
+
   Future<void> networkmetrics() async {
     final ping = Ping('8.8.8.8', count: 4); // Pinging Google's DNS server
 

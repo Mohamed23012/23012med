@@ -43,14 +43,14 @@ class SpeedTestFinishedPage extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 _buildSpeedInfo(
-                  'Upload',
-                  '${networkProvider.uploadSpeed.toStringAsFixed(1)} Mbps',
-                  Icons.cloud_upload,
-                ),
-                _buildSpeedInfo(
                   'Download',
                   '${networkProvider.downloadSpeed.toStringAsFixed(1)} Mbps',
                   Icons.cloud_download,
+                ),
+                _buildSpeedInfo(
+                  'Signal',
+                  '${networkProvider.signalStrengthValue}',
+                  Icons.network_check,
                 ),
               ],
             ),
@@ -60,12 +60,20 @@ class SpeedTestFinishedPage extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                _buildSpeedInfo('Ping', '${networkProvider.ping.toStringAsFixed(1)} ms', Icons.timer),
-                _buildSpeedInfo('Jitter', '${networkProvider.jitter.toStringAsFixed(1)} ms', Icons.speed),
                 _buildSpeedInfo(
-                  'Signal',
-                  '${networkProvider.signalStrengthValue}',
-                  Icons.network_check,
+                  'Ping', 
+                  '${networkProvider.ping.toStringAsFixed(1)} ms', 
+                  Icons.timer
+                ),
+                _buildSpeedInfo(
+                  'Jitter', 
+                  '${networkProvider.jitter.toStringAsFixed(1)} ms',
+                  Icons.speed
+                ),
+                _buildSpeedInfo(
+                  'Upload',
+                  '${networkProvider.uploadSpeed.toStringAsFixed(1)} Mbps',
+                  Icons.cloud_upload,
                 ),
               ],
             ),

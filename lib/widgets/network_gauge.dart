@@ -24,10 +24,10 @@ class NetworkGauge extends StatelessWidget {
       child: SfRadialGauge(
         axes: <RadialAxis>[
           RadialAxis(
-            startAngle: 180,
-            endAngle: 0,
+            startAngle: 130,
+            endAngle: 50,
             minimum: 0,
-            maximum: 200, // Adjust maximum based on your speed range
+            maximum: 100, // Adjust maximum based on your speed range
             showLabels: false,
             showTicks: false,
             axisLineStyle: AxisLineStyle(
@@ -44,20 +44,20 @@ class NetworkGauge extends StatelessWidget {
                 sizeUnit: GaugeSizeUnit.factor,
                 color: downloadColor,
               ),
-              RangePointer(
+              /*RangePointer(
                 value: uploadValue,
                 cornerStyle: CornerStyle.bothCurve,
-                width: 0.05, // Slightly thinner for contrast
+                width: 0.15, // Slightly thinner for contrast
                 sizeUnit: GaugeSizeUnit.factor,
                 color: uploadColor,
-              ),
+              ),*/
             ],
-            annotations: <GaugeAnnotation>[
+            annotations: const <GaugeAnnotation>[
               GaugeAnnotation(
                 widget: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const SizedBox(height: 2), 
+                    SizedBox(height: 2), 
                     // const Text(
                     //   'Download',
                     //   style: TextStyle(
@@ -74,7 +74,7 @@ class NetworkGauge extends StatelessWidget {
                     //     color: Colors.black,
                     //   ),
                     // ),
-                    const SizedBox(height: 40), // Add spacing
+                    SizedBox(height: 20), // Add spacing
                     // const Text(
                     //   'Upload',
                     //   style: TextStyle(
