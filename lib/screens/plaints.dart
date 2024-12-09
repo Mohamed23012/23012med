@@ -163,7 +163,7 @@ class _ComplaintsScreenState extends State<ComplaintsScreen> {
             Column(
               children: [
                 _buildStars(),
-                const SizedBox(height: 8),
+                const SizedBox(height: 3),
                 const Text(
                   "Rate your experience, it is important for us",
                   style: TextStyle(fontSize: 16),
@@ -171,7 +171,7 @@ class _ComplaintsScreenState extends State<ComplaintsScreen> {
                 ),
               ],
             ),
-            const SizedBox(height: 10),
+            const SizedBox(height: 5),
 
             // Complaint Input
             TextField(
@@ -199,7 +199,7 @@ class _ComplaintsScreenState extends State<ComplaintsScreen> {
               maxLines: 2,
             ),
 
-            const SizedBox(height: 16),
+            const SizedBox(height: 10),
             Center(
               child: ElevatedButton(
                 onPressed: _submitComplaint,

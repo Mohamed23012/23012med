@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../services/network_provider.dart';
-import '../widgets/network_gauge.dart';
-import '../services/network_provider.dart';
 class SpeedTestFinishedPage extends StatelessWidget {
   const SpeedTestFinishedPage({super.key});
 

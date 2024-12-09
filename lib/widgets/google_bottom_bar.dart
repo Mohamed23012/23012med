@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:internet/screens/SpeedTestApp.dart';
 import 'package:internet/screens/plaints.dart';
 import '../screens/home_screen.dart';
 import '../screens/history_screen.dart';
@@ -32,7 +31,7 @@ class _GoogleBottomBarState extends State<GoogleBottomBar> {
         mainAxisSize: MainAxisSize.min,
         children: [
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 2),
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
             child: Theme(
               data: Theme.of(context).copyWith(
                 splashFactory: NoSplash.splashFactory,
