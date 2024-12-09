@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:internet/screens/Test%20Finished.dart';
+import 'package:internet/screens/TestFinished.dart';
 import 'package:provider/provider.dart';
 import 'package:syncfusion_flutter_gauges/gauges.dart';
 import '../services/network_provider.dart';
@@ -348,7 +348,7 @@ class _HomeScreenState extends State<HomeScreen> {
         },
         style: ElevatedButton.styleFrom(
           backgroundColor: Colors.red, // Button color
-          padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 15),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
@@ -358,9 +358,10 @@ class _HomeScreenState extends State<HomeScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(
-              Icons.warning, // Danger icon
+              Icons.warning_amber_outlined, // Danger icon
               color: Colors.white,
-              size: 20, // Adjust the size if necessary
+              size: 22,
+               // Adjust the size if necessary
             ),
             SizedBox(width: 8), // Add some space between the icon and the text
             Text(

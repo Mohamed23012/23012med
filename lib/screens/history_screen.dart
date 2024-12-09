@@ -1,8 +1,8 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:internet/screens/TestFinished.dart';
 import 'package:internet/services/network_provider.dart';
 import 'package:http/http.dart' as http;
-import 'package:internet/widgets/Detail.dart';
 import 'package:provider/provider.dart';
 
 class HistoryScreen extends StatefulWidget {
@@ -33,56 +33,66 @@ class _HistoryScreenState extends State<HistoryScreen> {
     });
   }
 
-Future<void> _loadHistoryData() async {
-  try {
-    final response = await http.get(
-      Uri.parse('http://104.154.91.24:8000/api/retrieve-data?index_name=qualitynet'),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    );
-
-    if (response.statusCode == 200) {
-      final Map<String, dynamic> responseBody = json.decode(response.body);
-      final List<dynamic> results = responseBody['result'];
-
-      List<Map<String, dynamic>> loadedData = [];
-      double totalDownload = 0.0;
-      double totalSignal = 0.0;
-
-      for (var item in results) {
-        final source = item['_source']; // Access the '_source' field in Elasticsearch results
-
-        // Add default fallback values for null fields
-        final date = source['date'] ?? 'Unknown Date';
-        final downloadSpeed = source['downloadSpeed']?.toString() ?? '0.0';
-        final signalStrengthValue = source['signalStrengthValue']?.toString() ?? '0';
-        final networkType = source['networkType'] ?? '';
-
-        loadedData.add({
-          'date': date,
-          'download': downloadSpeed,
-          'signal': signalStrengthValue,
-          'technology': networkType,
-        });
-
-        totalDownload += double.tryParse(downloadSpeed) ?? 0.0;
-        totalSignal += double.tryParse(signalStrengthValue) ?? 0.0;
-      }
-
-      setState(() {
-        _historyData = loadedData;
-        _totalTests = loadedData.length;
-        _downloadAvg = totalDownload / (_totalTests > 0 ? _totalTests : 1);
-        _signalAvg = totalSignal / (_totalTests > 0 ? _totalTests : 1);
-      });
+  String getSignalQuality(double signalValue) {
+    if (signalValue <= -80) {
+      return 'Great';
+    } else if (signalValue <= -50) {
+      return 'Good';
     } else {
-      print('Failed to fetch history data: ${response.body}');
+      return 'Bad';
     }
-  } catch (e) {
-    print('Error loading history data: $e');
   }
-}
+
+  Future<void> _loadHistoryData() async {
+    try {
+      final response = await http.get(
+        Uri.parse('http://104.154.91.24:8000/api/retrieve-data?index_name=qualitynet'),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> responseBody = json.decode(response.body);
+        final List<dynamic> results = responseBody['result'];
+
+        List<Map<String, dynamic>> loadedData = [];
+        double totalDownload = 0.0;
+        double totalSignal = 0.0;
+
+        for (var item in results) {
+          final source = item['_source']; // Access the '_source' field in Elasticsearch results
+
+          // Add default fallback values for null fields
+          final date = source['date'] ?? 'Unknown Date';
+          final downloadSpeed = source['downloadSpeed']?.toString() ?? '0.0';
+          final signalStrengthValue = source['signalStrengthValue']?.toString() ?? '0';
+          final networkType = source['networkType'] ?? '';
+
+          loadedData.add({
+            'date': date,
+            'download': downloadSpeed,
+            'signal': double.parse(signalStrengthValue.replaceAll(" dBm", "")),
+            'technology': networkType,
+          });
+
+          totalDownload += double.tryParse(downloadSpeed) ?? 0.0;
+          totalSignal += double.tryParse(signalStrengthValue) ?? 0.0;
+        }
+
+        setState(() {
+          _historyData = loadedData;
+          _totalTests = loadedData.length;
+          _downloadAvg = totalDownload / (_totalTests > 0 ? _totalTests : 1);
+          _signalAvg = totalSignal / (_totalTests > 0 ? _totalTests : 1);
+        });
+      } else {
+        print('Failed to fetch history data: ${response.body}');
+      }
+    } catch (e) {
+      print('Error loading history data: $e');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -179,113 +189,113 @@ Future<void> _loadHistoryData() async {
               const SizedBox(height: 16.0),
 
               // History List
-             Expanded(
-  child: ListView.builder(
-    itemCount: filteredData.length,
-    itemBuilder: (context, index) {
-      final item = filteredData[index];
-      return GestureDetector(
-        onTap: () {
-          // Navigate to the DetailsScreen with the selected item
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => DetailsScreen(result: item),
-            ),
-          );
-        },
-        child: Container(
-          margin: const EdgeInsets.only(bottom: 16.0),
-          padding: const EdgeInsets.all(16.0),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(12.0),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.1),
-                blurRadius: 5,
-                offset: const Offset(0, 3),
-              ),
-            ],
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              // Type Icon
-              Icon(
-                _selectedTechnology == 'WiFi' ? Icons.wifi : Icons.speaker_phone,
-                size: 32,
-                color: Colors.blue,
-              ),
-
-              // Date and Download Details
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        item['date'],
-                        style: const TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.black,
-                        ),
-                      ),
-                      const SizedBox(height: 4.0),
-                      Row(
-                        children: [
-                          const Text(
-                            'Download: ',
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.grey,
-                            ),
-                          ),
-                          Text(
-                            '${item['download']} Mbps',
-                            style: const TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.black,
-                            ),
-                          ),
-                        ],
+            Expanded(
+              child: ListView.builder(
+              itemCount: filteredData.length,
+              itemBuilder: (context, index) {
+              final item = filteredData[index];
+              return GestureDetector(
+                onTap: () {
+                  // Navigate to the DetailsScreen with the selected item
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => SpeedTestFinishedPage(),
+                    ),
+                  );
+                },
+                child: Container(
+                  margin: const EdgeInsets.only(bottom: 12.0),
+                  padding: const EdgeInsets.all(16.0),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12.0),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.1),
+                        blurRadius: 5,
+                        offset: const Offset(0, 3),
                       ),
                     ],
                   ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      // Type Icon
+                      Icon(
+                        _selectedTechnology == 'WiFi' ? Icons.wifi : Icons.speaker_phone,
+                        size: 32,
+                        color: Colors.blue,
+                      ),
+
+                      // Date and Download Details
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  const Text(
+                                    'Download: ',
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.grey,
+                                    ),
+                                  ),
+                                  Text(
+                                    '${item['download']} Mbps',
+                                    style: const TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 4.0),
+                              Text(
+                                item['date'],
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black,
+                                ),
+                              ),
+                              const SizedBox(height: 4.0),
+                            ],
+                          ),
+                        ),
+                      ),
+
+                          // Signal Strength
+                          Row(
+                            children: [
+                              const Icon(
+                                Icons.signal_cellular_alt,
+                                size: 24,
+                                color: Colors.green,
+                              ),
+                              const SizedBox(width: 4.0),
+                              Text(
+                                getSignalQuality(item['signal'] ?? 0.0),
+                                style: const TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black,
+                                ),
+                              ),
+                            ],
+                           ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
                 ),
               ),
-
-              // Signal Strength
-              Row(
-                children: [
-                  const Icon(
-                    Icons.signal_cellular_alt,
-                    size: 24,
-                    color: Colors.green,
-                  ),
-                  const SizedBox(width: 4.0),
-                  Text(
-                    '${item['signal']}',
-                    style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-      );
-    },
-  ),
-),
-
             ],
           ),
         ),
