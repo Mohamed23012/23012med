@@ -324,15 +324,15 @@ class _HistoryScreenState extends State<HistoryScreen> {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Icon(icon, color: Colors.blue),
-          const SizedBox(height: 8.0),
+          const SizedBox(height: 4.0),
           Text(
             value,
-            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 4.0),
           Text(
             label,
-            style: const TextStyle(fontSize: 12, color: Colors.grey),
+            style: const TextStyle(fontSize: 10, color: Colors.grey),
             textAlign: TextAlign.center,
           ),
         ],

@@ -171,7 +171,7 @@ class NetworkProvider with ChangeNotifier {
   }
 
 
-  Future<void> storeData() async {
+  Future<void> storeDataTest() async {
     if (_isCancelled) {
       print("Test annulé - données non enregistrées.");
       _isCancelled = false;
@@ -253,6 +253,65 @@ class NetworkProvider with ChangeNotifier {
       totalDifference += (pingTimes[i] - pingTimes[i - 1]).abs();
     }
     return totalDifference / (pingTimes.length - 1);
+  }
+
+  Future<void> storeDataPlaint({
+    required String complaint,
+    required double rating,
+  }) async {
+    final prefs = await SharedPreferences.getInstance();
+
+    // Récupérer la date et l'heure actuelles
+    final now = DateTime.now();
+    final dateFormat = DateFormat('yyyy-MM-dd');
+    final timeFormat = DateFormat('HH:mm:ss');
+
+    final dateTimeFormat = DateFormat(
+        'yyyy-MM-dd HH:mm:ss'); // Format: Year-Month-Day Hour:Minute:Second
+    final dateTimeString = dateTimeFormat.format(now);
+
+    final dateString = dateFormat.format(now);
+    final timeString = timeFormat.format(now); // Convert time to string
+
+    // Préparer les données pour la plainte
+    final data = {
+      "index_name": "complaints",
+      "document": {
+        'complaint': complaint,
+        'rating': rating,
+        'date': dateString,
+        'time': timeString,
+        'timestamp': dateTimeString,
+        'operator': _operator ?? 'Unknown',
+        'networkType': _networkType ?? 'Unknown',
+        'location': {"lat": _lat, "lon": _lon},
+        'place': _location ?? 'Unknown',
+        'device': _device ?? 'Unknown',
+      },
+    };
+
+    final url = Uri.parse(
+        'http://104.154.91.24:8000/api/insert_data?index_name=complaints'); // Remplacez par votre endpoint
+    try {
+      final response = await http.post(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode(data),
+      );
+
+      if (response.statusCode == 201) {
+        print('Complaint inserted successfully: ${response.body}');
+      } else {
+        print('Failed to insert complaint: ${response.body}');
+      }
+    } catch (e) {
+      print('Error: $e');
+    }
+
+    // Enregistrer la plainte localement dans SharedPreferences
+    await prefs.setString(dateTimeString, jsonEncode(data));
   }
 
   Future<void> retrieveLocation() async {

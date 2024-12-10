@@ -44,7 +44,7 @@ class _ComplaintsScreenState extends State<ComplaintsScreen> {
 
   void _submitComplaint() async {
     if (_currentRating > 0 || _complaintController.text.isNotEmpty) {
-      // Show a loading indicator while data is being stored
+      // Afficher un indicateur de chargement
       showDialog(
         context: context,
         barrierDismissible: false,
@@ -53,33 +53,44 @@ class _ComplaintsScreenState extends State<ComplaintsScreen> {
         ),
       );
 
-      // Add the complaint to local storage
+      final complaintText = _complaintController.text;
+      final complaintRating = _currentRating;
+
+      // Ajouter la plainte localement
       setState(() {
         _complaints.add({
           'date': DateTime.now().toIso8601String(),
-          'rating': _currentRating,
-          'complaint': _complaintController.text,
+          'rating': complaintRating,
+          'complaint': complaintText,
         });
         _complaintController.clear();
         _currentRating = 0.0;
       });
 
-      // Save the complaints locally
+      // Sauvegarder les plaintes localement
       await _saveComplaints();
+
       final networkProvider = Provider.of<NetworkProvider>(context, listen: false);
 
-      // Prepare and store data to the backend
+      // Envoyer les données de la plainte au backend
       try {
-        networkProvider.storeData(); // Call your storeData function
-        Navigator.pop(context); // Close the loading dialog
+        await networkProvider.storeDataPlaint(
+          complaint: complaintText,
+          rating: complaintRating,
+        );
+
+        Navigator.pop(context); // Fermer le dialogue de chargement
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Complaint submitted successfully!")),
+        );
       } catch (e) {
-        Navigator.pop(context); // Close the loading dialog
+        Navigator.pop(context); // Fermer le dialogue de chargement
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text("Failed to submit complaint: $e")),
         );
       }
     } else {
-      // Show an error if the rating or complaint is empty
+      // Afficher une erreur si la plainte ou l'évaluation est vide
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text("Please provide a rating and enter your complaint."),

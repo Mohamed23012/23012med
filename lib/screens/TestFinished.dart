@@ -130,7 +130,7 @@ class SpeedTestFinishedPage extends StatelessWidget {
                 await networkProvider.fetchOperatorInfo();
                 await networkProvider.networkmetrics();
                 await networkProvider.startTest();
-                networkProvider.storeData();// Return to the main screen to restart the test
+                networkProvider.storeDataTest();// Return to the main screen to restart the test
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF1E88E5), // Blue button color
