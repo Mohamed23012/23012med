@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../services/network_provider.dart';
+
 class SpeedTestFinishedPage extends StatelessWidget {
   const SpeedTestFinishedPage({super.key});
 
@@ -40,55 +41,57 @@ class SpeedTestFinishedPage extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                _buildSpeedInfo(
-                  'Download',
-                  '${networkProvider.downloadSpeed.toStringAsFixed(1)} Mbps',
-                  Icons.cloud_download,
+                _buildSpeedCard(
+                  label: 'Download',
+                  value: '${networkProvider.downloadSpeed.toStringAsFixed(1)} Mbps',
+                  iconPath: 'assets/icons/down.png',
+                  isLarge: true, // Larger card
                 ),
-                _buildSpeedInfo(
-                  'Signal',
-                  '${networkProvider.signalStrengthValue}',
-                  Icons.network_check,
+                _buildSpeedCard(
+                  label: 'Signal',
+                  value: '${networkProvider.signalStrengthValue ?? 'N/A'}',
+                  iconPath: 'assets/icons/signal_rate.png',
+                  isLarge: true, // Larger card
+                ),
+              ],
+            ),
+            const SizedBox(height: 10), // Space between rows
+
+            // Ping, Jitter, and Upload (Smaller Cards)
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                _buildSpeedCard(
+                  label: 'Ping',
+                  value: '${networkProvider.ping.toStringAsFixed(1)} ms',
+                  iconPath: 'assets/icons/ping.png',
+                ),
+                _buildSpeedCard(
+                  label: 'Jitter',
+                  value: '${networkProvider.jitter.toStringAsFixed(1)} ms',
+                  iconPath: 'assets/icons/jitter.png',
+                ),
+                _buildSpeedCard(
+                  label: 'Upload',
+                  value: '${networkProvider.uploadSpeed.toStringAsFixed(1)} Mbps',
+                  iconPath: 'assets/icons/up.png',
                 ),
               ],
             ),
             const SizedBox(height: 20),
-
-            // Ping, Jitter, and Mbps
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                _buildSpeedInfo(
-                  'Ping', 
-                  '${networkProvider.ping.toStringAsFixed(1)} ms', 
-                  Icons.timer
-                ),
-                _buildSpeedInfo(
-                  'Jitter', 
-                  '${networkProvider.jitter.toStringAsFixed(1)} ms',
-                  Icons.speed
-                ),
-                _buildSpeedInfo(
-                  'Upload',
-                  '${networkProvider.uploadSpeed.toStringAsFixed(1)} Mbps',
-                  Icons.cloud_upload,
-                ),
-              ],
-            ),
-            const SizedBox(height: 30),
 
             // Banner Image
             Container(
               height: 120,
               decoration: BoxDecoration(
                 image: const DecorationImage(
-                  image: AssetImage('assets/images/Capture.png'), // Replace with your image path
+                  image: AssetImage('assets/images/Capture.png'),
                   fit: BoxFit.cover,
                 ),
                 borderRadius: BorderRadius.circular(12.0),
               ),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 10),
 
             // Network Information Section
             const Text(
@@ -103,21 +106,35 @@ class SpeedTestFinishedPage extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                _buildNetworkInfoCard(
-              icon: Icons.wifi,
-              label: 'Technologie',
-              value: networkProvider.networkType ?? 'Unknown',
-            ),
-            _buildNetworkInfoCard(
-              icon: Icons.business,
-              label: 'Opérateur',
-              value: networkProvider.operator ?? 'Unknown',
-            ),
-            _buildNetworkInfoCard(
-              icon: Icons.location_on,
-              label: 'Location',
-              value: networkProvider.location ?? 'Unknown',
-            ),
+                _buildNetworkCard(
+                  icon: Image.asset(
+                    networkProvider.networkType == networkProvider.wifiName
+                        ? 'assets/icons/wifi.png'
+                        : 'assets/icons/signal.png',
+                    width: 30,
+                    height: 30,
+                  ),
+                  label: 'Technologie',
+                  value: networkProvider.networkType ?? '',
+                ),
+                _buildNetworkCard(
+                  icon: Image.asset(
+                    'assets/icons/glob.png',
+                    width: 30,
+                    height: 30,
+                  ),
+                  label: 'Opérateur',
+                  value: networkProvider.operator ?? '',
+                ),
+                _buildNetworkCard(
+                  icon: Image.asset(
+                    'assets/icons/loc.png',
+                    width: 30,
+                    height: 30,
+                  ),
+                  label: 'Location',
+                  value: networkProvider.location ?? '',
+                ),
               ],
             ),
             const SizedBox(height: 20),
@@ -130,10 +147,10 @@ class SpeedTestFinishedPage extends StatelessWidget {
                 await networkProvider.fetchOperatorInfo();
                 await networkProvider.networkmetrics();
                 await networkProvider.startTest();
-                networkProvider.storeDataTest();// Return to the main screen to restart the test
+                networkProvider.storeDataTest(); // Restart the test
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF1E88E5), // Blue button color
+                backgroundColor: const Color(0xFF1E88E5),
                 padding: const EdgeInsets.symmetric(
                   horizontal: 24.0,
                   vertical: 12.0,
@@ -157,48 +174,106 @@ class SpeedTestFinishedPage extends StatelessWidget {
     );
   }
 
-  Widget _buildSpeedInfo(String label, String value, IconData icon) {
-    return Column(
-      children: [
-        Icon(icon, size: 30, color: Colors.blue),
-        const SizedBox(height: 4),
-        Text(
-          label,
-          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          value,
-          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-        ),
-      ],
+  Widget _buildSpeedCard({
+    required String label,
+    required String value,
+    required String iconPath,
+    bool isLarge = false,
+  }) {
+    return Container(
+      width: isLarge ? 120 : 80,
+      height: isLarge ? 100 : 90,
+      padding: const EdgeInsets.all(8.0),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(10),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.2),
+            spreadRadius: 2,
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Image.asset(
+            iconPath,
+            width: isLarge ? 20 : 10,
+            height: isLarge ? 20 : 10,
+            fit: BoxFit.contain,
+          ),
+          const SizedBox(height: 8),
+          Text(
+            value,
+            style: TextStyle(
+              fontSize: isLarge ? 14 : 12,
+              fontWeight: FontWeight.bold,
+              color: Colors.black,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 4),
+          Text(
+            label,
+            style: const TextStyle(
+              fontSize: 12,
+              color: Colors.grey,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
     );
   }
 
-  Widget _buildNetworkInfoCard({
-    required IconData icon,
+  Widget _buildNetworkCard({
+    required Widget icon,
     required String label,
     required String value,
   }) {
-    return Column(
-      children: [
-        Icon(icon, size: 30, color: Colors.blueAccent),
-        const SizedBox(height: 4),
-        Text(
-          label,
-          style: const TextStyle(fontSize: 14, color: Colors.grey),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          value,
-          style: const TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-            color: Colors.black,
+    return Container(
+      width: 90,
+      height: 120,
+      padding: const EdgeInsets.all(8.0),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(10),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.2),
+            spreadRadius: 2,
+            blurRadius: 4,
+            offset: const Offset(0, 2),
           ),
-          textAlign: TextAlign.center,
-        ),
-      ],
+        ],
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          icon,
+          const SizedBox(height: 8),
+          Text(
+            label,
+            style: const TextStyle(
+              fontSize: 10,
+              color: Colors.grey,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            value,
+            style: const TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.bold,
+              color: Colors.black,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
     );
   }
 }

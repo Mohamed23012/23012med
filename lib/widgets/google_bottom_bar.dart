@@ -67,19 +67,27 @@ class _GoogleBottomBarState extends State<GoogleBottomBar> {
                   elevation: 0, // Remove BottomNavigationBar shadow
                   items: const [
                     BottomNavigationBarItem(
-                      icon: Icon(Icons.speed),
+                      icon: ImageIcon(
+                        AssetImage('assets/icons/dashboard.png'),
+                      ),
                       label: "Speed",
                     ),
                     BottomNavigationBarItem(
-                      icon: Icon(Icons.feedback),
+                      icon: ImageIcon(
+                        AssetImage('assets/icons/comment.png'),
+                      ),
                       label: "Plaints",
                     ),
                     BottomNavigationBarItem(
-                      icon: Icon(Icons.history),
+                      icon: ImageIcon(
+                        AssetImage('assets/icons/history.png'),
+                      ),
                       label: "History",
                     ),
                     BottomNavigationBarItem(
-                      icon: Icon(Icons.star),
+                      icon: ImageIcon(
+                        AssetImage('assets/icons/star.png'),
+                      ),
                       label: "Search",
                     ),
                   ],

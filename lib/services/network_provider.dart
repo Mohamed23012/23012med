@@ -81,6 +81,7 @@ class NetworkProvider with ChangeNotifier {
         _uploadSpeed = upload.transferRate;
 
         isTesting = false;
+        markTestAsCompleted();
         if (!testCompleter.isCompleted) {
           testCompleter.complete();
         }
@@ -126,11 +127,19 @@ class NetworkProvider with ChangeNotifier {
     await testCompleter.future;
   }
 
+  bool isTestCompleted = false; // Flag to track test completion
+
+  void markTestAsCompleted() {
+    isTestCompleted = true;
+    notifyListeners();
+  }
+
   void stopTest() {
     if (isTesting) {
-      speedTest.cancelTest(); // Annule le test en cours
+      isTestCompleted = false;
       _isCancelled = true;
       isTesting = false;
+      speedTest.cancelTest();
     }
 
     // Réinitialiser les variables de test si nécessaire

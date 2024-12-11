@@ -94,7 +94,7 @@ class _HomeScreenState extends State<HomeScreen> {
             borderRadius: BorderRadius.circular(12.0),
           ),
         ),
-        const SizedBox(height: 20),
+        const SizedBox(height: 40),
  
         // Circular Gauge with Start Test Button in Center
         Stack(
@@ -137,7 +137,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   networkProvider.storeDataTest();
 
                   // Navigate to the "Test Finished" page after completing the test
-                  if (mounted) {
+                  if (mounted && networkProvider.isTestCompleted) {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -178,35 +178,37 @@ class _HomeScreenState extends State<HomeScreen> {
         const SizedBox(height: 30),
 
         // Network Informations Section
-        const Text(
-          'Network Informations',
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            color: Colors.black,
-          ),
-        ),
-        const SizedBox(height: 10),
         Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            _buildNetworkInfoCard(
-              icon: networkProvider.networkType ==
-                            networkProvider.wifiName
-                        ? Icons.wifi
-                        : Icons.speaker_phone,
+            _buildNetworkCard(
+              icon: Image.asset(
+                networkProvider.networkType == networkProvider.wifiName
+                    ? 'assets/icons/wifi.png'
+                    : 'assets/icons/signal.png',
+                width: 20,
+                height: 20,
+              ),
               label: 'Technologie',
-              value: networkProvider.networkType ?? '',
+              value: networkProvider.networkType ?? 'N/A',
             ),
-            _buildNetworkInfoCard(
-              icon: Icons.business,
-              label: 'Opérateur',
-              value: networkProvider.operator ?? '',
+            _buildNetworkCard(
+              icon: Image.asset(
+                'assets/icons/glob.png',
+                width: 20,
+                height: 20,
+              ),
+              label: 'Operateur',
+              value: networkProvider.operator ?? 'N/A',
             ),
-            _buildNetworkInfoCard(
-              icon: Icons.location_on,
+            _buildNetworkCard(
+              icon: Image.asset(
+                'assets/icons/loc.png',
+                width: 20,
+                height: 20,
+              ),
               label: 'Location',
-              value: networkProvider.location ?? '',
+              value: networkProvider.location ?? 'N/A',
             ),
           ],
         ),
@@ -222,42 +224,44 @@ class _HomeScreenState extends State<HomeScreen> {
       Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          _buildSpeedInfo(
-            'Download',
-            networkProvider.downloadSpeed.toStringAsFixed(1),
-            Icons.cloud_download,
+          _buildSpeedCard(
+            label: 'Download',
+            value: '${networkProvider.downloadSpeed.toStringAsFixed(1)} Mbps',
+            iconPath: 'assets/icons/down.png',
+            isLarge: true, // Larger card
           ),
-          _buildSpeedInfo(
-            'Signal',
-            '${networkProvider.signalStrengthValue}',
-            Icons.network_check,
+          _buildSpeedCard(
+            label: 'Signal',
+            value: '${networkProvider.signalStrengthValue ?? 'N/A'}',
+            iconPath: 'assets/icons/signal_rate.png',
+            isLarge: true, // Larger card
           ),
         ],
       ),
-      const SizedBox(height: 20),
+      const SizedBox(height: 10), // Space between rows
 
-      // Ping, Jitter, and Mbps
+      // Second Row for Ping, Jitter, and Upload (Smaller Cards)
       Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          _buildSpeedInfo(
-            'Ping',
-            '${networkProvider.ping.toStringAsFixed(1)} ms',
-            Icons.timer,
+          _buildSpeedCard(
+            label: 'Ping',
+            value: '${networkProvider.ping.toStringAsFixed(1)} ms',
+            iconPath: 'assets/icons/ping.png',
           ),
-          _buildSpeedInfo(
-            'Jitter',
-            '${networkProvider.jitter.toStringAsFixed(1)} ms',
-            Icons.speed,
+          _buildSpeedCard(
+            label: 'Jitter',
+            value: '${networkProvider.jitter.toStringAsFixed(1)} ms',
+            iconPath: 'assets/icons/jitter.png',
           ),
-          _buildSpeedInfo(
-            'Upload',
-            networkProvider.uploadSpeed.toStringAsFixed(1),
-            Icons.cloud_upload,
+          _buildSpeedCard(
+            label: 'Upload',
+            value: '${networkProvider.uploadSpeed.toStringAsFixed(1)} Mbps',
+            iconPath: 'assets/icons/up.png',
           ),
         ],
       ),
-      const SizedBox(height: 20),
+      const SizedBox(height: 7),
 
       // Circular Gauge
       Stack(
@@ -299,7 +303,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ],
       ),
-      const SizedBox(height: 15),
+      const SizedBox(height: 5),
 
       // Network Informations Section
       const Text(
@@ -310,30 +314,42 @@ class _HomeScreenState extends State<HomeScreen> {
           color: Colors.black,
         ),
       ),
-      const SizedBox(height: 10),
+      const SizedBox(height: 5),
       Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          _buildNetworkInfoCard(
-            icon: networkProvider.networkType == networkProvider.wifiName
-                ? Icons.wifi
-                : Icons.speaker_phone,
+          _buildNetworkCard(
+            icon: Image.asset(
+              networkProvider.networkType == networkProvider.wifiName
+                  ? 'assets/icons/wifi.png'
+                  : 'assets/icons/signal.png',
+              width: 30, // Ajustez la largeur de l'image si nécessaire
+              height: 20, // Ajustez la hauteur de l'image si nécessaire
+            ),
             label: 'Technologie',
-            value: networkProvider.networkType ?? 'Unknown',
+            value: networkProvider.networkType ?? '',
           ),
-          _buildNetworkInfoCard(
-            icon: Icons.business,
+          _buildNetworkCard(
+            icon: Image.asset(
+              'assets/icons/glob.png',
+              width: 30,
+              height: 30,
+            ),
             label: 'Opérateur',
-            value: networkProvider.operator ?? 'Unknown',
+            value: networkProvider.operator ?? '',
           ),
-          _buildNetworkInfoCard(
-            icon: Icons.location_on,
+          _buildNetworkCard(
+            icon: Image.asset(
+              'assets/icons/loc.png',
+              width: 30,
+              height: 30,
+            ),
             label: 'Location',
-            value: networkProvider.location ?? 'Unknown',
+            value: networkProvider.location ?? '',
           ),
         ],
       ),
-      const SizedBox(height: 15),
+      const SizedBox(height: 5),
 
       // Stop Test Button
       ElevatedButton(
@@ -348,7 +364,7 @@ class _HomeScreenState extends State<HomeScreen> {
         },
         style: ElevatedButton.styleFrom(
           backgroundColor: Colors.red, // Button color
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),
@@ -368,7 +384,7 @@ class _HomeScreenState extends State<HomeScreen> {
               'STOP TEST',
               style: TextStyle(
                 color: Colors.white,
-                fontSize: 16,
+                fontSize: 14,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -379,48 +395,111 @@ class _HomeScreenState extends State<HomeScreen> {
   );
 }
 
-  Widget _buildNetworkInfoCard({
-    required IconData icon,
+  Widget _buildNetworkCard({
+    required Widget icon,
     required String label,
     required String value,
   }) {
-    return Column(
-      children: [
-        Icon(icon, size: 30, color: Colors.blueAccent),
-        const SizedBox(height: 4),
-        Text(
-          label,
-          style: const TextStyle(fontSize: 14, color: Colors.grey),
+    return Expanded(
+      child: Container(
+        width:120,
+        height:120,
+        margin: const EdgeInsets.symmetric(horizontal: 5), // Espacement entre les cartes
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.2),
+              spreadRadius: 2,
+              blurRadius: 5,
+              offset: const Offset(0, 3),
+            ),
+          ],
         ),
-        const SizedBox(height: 4),
-        Text(
-          value,
-          style: const TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-            color: Colors.black,
-          ),
-          textAlign: TextAlign.center,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            icon,
+            const SizedBox(height: 4),
+            Text(
+              label,
+              style: const TextStyle(
+                fontSize: 10,
+                fontWeight: FontWeight.bold,
+                color: Colors.grey,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 4),
+            Text(
+              value,
+              style: const TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
         ),
-      ],
+      ),
     );
   }
 
-  Widget _buildSpeedInfo(String label, String value, IconData icon) {
-    return Column(
-      children: [
-        Icon(icon, size: 30, color: Colors.blue),
-        const SizedBox(height: 4),
-        Text(
-          label,
-          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          value,
-          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-        ),
-      ],
+ Widget _buildSpeedCard({
+    required String label,
+    required String value,
+    required String iconPath,
+    bool isLarge = false, // Flag to determine card size
+  }) {
+    return Container(
+      width: isLarge ? 120 : 80, // Larger width for specific cards
+      height: isLarge ? 100 : 90, // Larger height for specific cards
+      padding: const EdgeInsets.all(8.0),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(10), // Slightly rounded corners
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.2),
+            spreadRadius: 2,
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Image.asset(
+            iconPath,
+            width: isLarge ? 20 : 10, // Larger icon size for large cards
+            height: isLarge ? 20 : 10,
+            fit: BoxFit.contain,
+          ),
+          const SizedBox(height: 8),
+          Text(
+            value,
+            style: TextStyle(
+              fontSize: isLarge ? 14 : 12, // Slightly larger font for large cards
+              fontWeight: FontWeight.bold,
+              color: Colors.black,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 4),
+          Text(
+            label,
+            style: const TextStyle(
+              fontSize: 12,
+              color: Colors.grey,
+            ),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
     );
   }
 }

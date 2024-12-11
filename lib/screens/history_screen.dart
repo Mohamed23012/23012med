@@ -77,7 +77,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
           });
 
           totalDownload += double.tryParse(downloadSpeed) ?? 0.0;
-          totalSignal += double.tryParse(signalStrengthValue) ?? 0.0;
+          totalSignal += double.parse(signalStrengthValue.replaceAll(" dBm", ""));
         }
 
         setState(() {
