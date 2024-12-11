@@ -300,7 +300,7 @@ class NetworkProvider with ChangeNotifier {
     };
 
     final url = Uri.parse(
-        'http://104.154.91.24:8000/api/insert_data?index_name=complaints'); // Remplacez par votre endpoint
+        'http://104.154.91.24:8000/api/insert_data/'); // Remplacez par votre endpoint
     try {
       final response = await http.post(
         url,

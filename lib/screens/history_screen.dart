@@ -54,12 +54,14 @@ class _HistoryScreenState extends State<HistoryScreen> {
           final source = item['_source'];
 
           final date = source['date'] ?? 'Unknown Date';
+          final time = source['time'] ?? 'Unknown Time';
           final downloadSpeed = source['downloadSpeed']?.toString() ?? '0.0';
           final signalStrengthValue = source['signalStrengthValue']?.toString() ?? '0';
           final networkType = source['networkType'] ?? '';
 
           loadedData.add({
             'date': date,
+            'time': time,
             'download': downloadSpeed,
             'signal': double.parse(signalStrengthValue.replaceAll(" dBm", "")),
             'technology': networkType,
@@ -139,7 +141,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                 children: [
                   Expanded(
                     child: _buildStatCard(
-                      'Total tests',
+                      'Total tests taken',
                       _totalTests.toString(),
                       'assets/icons/check.png',
                     ),
@@ -162,7 +164,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                   ),
                 ],
               ),
-              const SizedBox(height: 16.0),
+              const SizedBox(height: 20),
 
               const Text(
                 'Result History',
@@ -172,33 +174,33 @@ class _HistoryScreenState extends State<HistoryScreen> {
                   color: Colors.black,
                 ),
               ),
-              const SizedBox(height: 10.0),
+              const SizedBox(height: 20),
 
               // Column Titles
               Container(
-                padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
-                color: Colors.grey[300],
+                padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 16),
+                color: Colors.grey[200],
                 child: const Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
                       'Type',
-                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                       textAlign: TextAlign.center,
                     ),
                     Text(
                       'Date',
-                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                       textAlign: TextAlign.center,
                     ),
                     Text(
                       'Download',
-                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                       textAlign: TextAlign.center,
                     ),
                     Text(
                       'Signal',
-                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                       textAlign: TextAlign.center,
                     ),
                   ],
@@ -221,7 +223,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                       },
                       child: Container(
                         width: 100,
-                        height: 60,
+                        height: 80,
                         margin: const EdgeInsets.only(bottom: 12.0),
                         padding: const EdgeInsets.all(12.0),
                         decoration: BoxDecoration(
@@ -254,6 +256,12 @@ class _HistoryScreenState extends State<HistoryScreen> {
                                   style: const TextStyle(fontWeight: FontWeight.bold), 
                                   textAlign: TextAlign.center,
                                 ),
+                                /*const SizedBox(height: 2),
+                                Text(
+                                  item['time'],
+                                  style: const TextStyle(fontWeight: FontWeight.bold), 
+                                  textAlign: TextAlign.center,
+                                ),*/
                               ],
                             ),
                             Text(
@@ -281,6 +289,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
   Widget _buildStatCard(String label, String value, String iconPath) {
     return Container(
       width: 100,
+      height: 100,
       padding: const EdgeInsets.all(12.0),
       decoration: BoxDecoration(
         color: Colors.white,
