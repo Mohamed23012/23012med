@@ -33,16 +33,6 @@ class _HistoryScreenState extends State<HistoryScreen> {
     });
   }
 
-  String getSignalQuality(double signalValue) {
-    if (signalValue <= -80) {
-      return 'Great';
-    } else if (signalValue <= -50) {
-      return 'Good';
-    } else {
-      return 'Bad';
-    }
-  }
-
   Future<void> _loadHistoryData() async {
     try {
       final response = await http.get(
@@ -61,9 +51,8 @@ class _HistoryScreenState extends State<HistoryScreen> {
         double totalSignal = 0.0;
 
         for (var item in results) {
-          final source = item['_source']; // Access the '_source' field in Elasticsearch results
+          final source = item['_source'];
 
-          // Add default fallback values for null fields
           final date = source['date'] ?? 'Unknown Date';
           final downloadSpeed = source['downloadSpeed']?.toString() ?? '0.0';
           final signalStrengthValue = source['signalStrengthValue']?.toString() ?? '0';
@@ -96,20 +85,18 @@ class _HistoryScreenState extends State<HistoryScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // Filter history data based on selected technology
     final filteredData = _historyData
         .where((item) => item['technology'] == _selectedTechnology)
         .toList();
 
     return Scaffold(
-      backgroundColor: Colors.grey[200], // Light grey background
+      backgroundColor: Colors.grey[200],
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Dropdown and Title Row
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -121,16 +108,16 @@ class _HistoryScreenState extends State<HistoryScreen> {
                       color: Colors.black,
                     ),
                   ),
-                 DropdownButton<String>(
+                  DropdownButton<String>(
                     value: _selectedTechnology.isNotEmpty &&
                             ['4G', 'WiFi', '3G'].contains(_selectedTechnology)
                         ? _selectedTechnology
-                        : '4G', // Fallback to a default value
+                        : '4G',
                     onChanged: (String? newValue) {
                       setState(() {
                         _selectedTechnology = newValue!;
                       });
-                      _loadHistoryData(); // Call the method to fetch data based on the new selection
+                      _loadHistoryData();
                     },
                     items: ['4G', 'WiFi', '3G'].map((String value) {
                       return DropdownMenuItem<String>(
@@ -154,30 +141,29 @@ class _HistoryScreenState extends State<HistoryScreen> {
                     child: _buildStatCard(
                       'Total tests',
                       _totalTests.toString(),
-                      Icons.check_circle,
+                      'assets/icons/check.png',
                     ),
                   ),
-                  SizedBox(width: 8), // Ajout d'un espacement entre les cartes
+                  const SizedBox(width: 8),
                   Expanded(
                     child: _buildStatCard(
                       'Download Avg',
                       '${_downloadAvg.toStringAsFixed(2)} Mbps',
-                      Icons.download,
+                      'assets/icons/down.png',
                     ),
                   ),
-                  SizedBox(width: 8), // Ajout d'un espacement entre les cartes
+                  const SizedBox(width: 8),
                   Expanded(
                     child: _buildStatCard(
                       'Signal Avg',
-                      '${_signalAvg.toStringAsFixed(2)} Mbps',
-                      Icons.signal_cellular_alt,
+                      '${_signalAvg.toStringAsFixed(2)} dBm',
+                      'assets/icons/signal_rate.png',
                     ),
                   ),
                 ],
               ),
               const SizedBox(height: 16.0),
 
-              // History List Section
               const Text(
                 'Result History',
                 style: TextStyle(
@@ -186,109 +172,98 @@ class _HistoryScreenState extends State<HistoryScreen> {
                   color: Colors.black,
                 ),
               ),
-              const SizedBox(height: 16.0),
+              const SizedBox(height: 10.0),
 
-              // History List
-            Expanded(
-              child: ListView.builder(
-              itemCount: filteredData.length,
-              itemBuilder: (context, index) {
-              final item = filteredData[index];
-              return GestureDetector(
-                onTap: () {
-                  // Navigate to the DetailsScreen with the selected item
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => SpeedTestFinishedPage(),
+              // Column Titles
+              Container(
+                padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+                color: Colors.grey[300],
+                child: const Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Type',
+                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                      textAlign: TextAlign.center,
                     ),
-                  );
-                },
-                child: Container(
-                  margin: const EdgeInsets.only(bottom: 12.0),
-                  padding: const EdgeInsets.all(16.0),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(12.0),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
-                        blurRadius: 5,
-                        offset: const Offset(0, 3),
-                      ),
-                    ],
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      // Type Icon
-                      Icon(
-                        _selectedTechnology == 'WiFi' ? Icons.wifi : Icons.speaker_phone,
-                        size: 32,
-                        color: Colors.blue,
-                      ),
+                    Text(
+                      'Date',
+                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                      textAlign: TextAlign.center,
+                    ),
+                    Text(
+                      'Download',
+                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                      textAlign: TextAlign.center,
+                    ),
+                    Text(
+                      'Signal',
+                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
+              ),
 
-                      // Date and Download Details
-                      Expanded(
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                children: [
-                                  const Text(
-                                    'Download: ',
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.grey,
-                                    ),
-                                  ),
-                                  Text(
-                                    '${item['download']} Mbps',
-                                    style: const TextStyle(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.black,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 4.0),
-                              Text(
-                                item['date'],
-                                style: const TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.black,
-                                ),
-                              ),
-                              const SizedBox(height: 4.0),
-                            ],
+              Expanded(
+                child: ListView.builder(
+                  itemCount: filteredData.length,
+                  itemBuilder: (context, index) {
+                    final item = filteredData[index];
+                    return GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => SpeedTestFinishedPage(),
                           ),
+                        );
+                      },
+                      child: Container(
+                        width: 100,
+                        height: 60,
+                        margin: const EdgeInsets.only(bottom: 12.0),
+                        padding: const EdgeInsets.all(12.0),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(10),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.grey.withOpacity(0.2),
+                              blurRadius: 5,
+                              spreadRadius: 2,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
                         ),
-                      ),
-
-                          // Signal Strength
-                          Row(
-                            children: [
-                              const Icon(
-                                Icons.signal_cellular_alt,
-                                size: 24,
-                                color: Colors.green,
-                              ),
-                              const SizedBox(width: 4.0),
-                              Text(
-                                getSignalQuality(item['signal'] ?? 0.0),
-                                style: const TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.black,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Image.asset(
+                              item['technology'] == 'WiFi'
+                                  ? 'assets/icons/wifi.png'
+                                  : 'assets/icons/signal-status.png',
+                              width: 40,
+                              height: 30,
+                            ),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  item['date'],
+                                  style: const TextStyle(fontWeight: FontWeight.bold), 
+                                  textAlign: TextAlign.center,
                                 ),
-                              ),
-                            ],
-                           ),
+                              ],
+                            ),
+                            Text(
+                              '${double.parse(item['download'].toString()).toStringAsFixed(2)} Mbps',
+                              style: const TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                            Text(
+                              '${int.parse(item['signal'].toStringAsFixed(0))} dBm',
+                              style: const TextStyle(color: Colors.grey),
+                            ),
                           ],
                         ),
                       ),
@@ -303,8 +278,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
     );
   }
 
-  // Widget for Stats Card
-  Widget _buildStatCard(String label, String value, IconData icon) {
+  Widget _buildStatCard(String label, String value, String iconPath) {
     return Container(
       width: 100,
       padding: const EdgeInsets.all(12.0),
@@ -323,7 +297,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(icon, color: Colors.blue),
+          Image.asset(iconPath, width: 20, height: 20),
           const SizedBox(height: 4.0),
           Text(
             value,
