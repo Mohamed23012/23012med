@@ -52,16 +52,15 @@ class _HistoryScreenState extends State<HistoryScreen> {
 
         for (var item in results) {
           final source = item['_source'];
+          final sort = item['sort'];
 
-          final date = source['date'] ?? 'Unknown Date';
-          final time = source['time'] ?? 'Unknown Time';
+          final timestamp = sort[0] ?? 'Unknown timestamp';
           final downloadSpeed = source['downloadSpeed']?.toString() ?? '0.0';
           final signalStrengthValue = source['signalStrengthValue']?.toString() ?? '0';
           final networkType = source['networkType'] ?? '';
 
           loadedData.add({
-            'date': date,
-            'time': time,
+            'timestamp': timestamp,
             'download': downloadSpeed,
             'signal': double.parse(signalStrengthValue.replaceAll(" dBm", "")),
             'technology': networkType,
@@ -178,7 +177,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
 
               // Column Titles
               Container(
-                padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 16),
+                padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 14),
                 color: Colors.grey[200],
                 child: const Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -245,33 +244,41 @@ class _HistoryScreenState extends State<HistoryScreen> {
                               item['technology'] == 'WiFi'
                                   ? 'assets/icons/wifi.png'
                                   : 'assets/icons/signal-status.png',
-                              width: 40,
+                              width: 30,
                               height: 30,
                             ),
                             Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.center,
                               children: [
+                                const SizedBox(height: 10),
                                 Text(
-                                  item['date'],
-                                  style: const TextStyle(fontWeight: FontWeight.bold), 
-                                  textAlign: TextAlign.center,
+                                  '${item['timestamp'].split(' ')[0].split('-')[2]}-${item['timestamp'].
+                                  split(' ')[0].split('-')[1]}-${item['timestamp'].
+                                  split(' ')[0].split('-')[0]}',
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black,
+                                  ),
+                                  textAlign: TextAlign.left,
                                 ),
-                                /*const SizedBox(height: 2),
+                                const SizedBox(height: 2),
                                 Text(
-                                  item['time'],
-                                  style: const TextStyle(fontWeight: FontWeight.bold), 
-                                  textAlign: TextAlign.center,
-                                ),*/
+                                  item['timestamp'].split(' ')[1].substring(0, 5),
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black,
+                                  ),
+                                  textAlign: TextAlign.left,
+                                ),
                               ],
                             ),
                             Text(
                               '${double.parse(item['download'].toString()).toStringAsFixed(2)} Mbps',
                               style: const TextStyle(fontWeight: FontWeight.bold),
                             ),
-                            Text(
-                              '${int.parse(item['signal'].toStringAsFixed(0))} dBm',
-                              style: const TextStyle(color: Colors.grey),
-                            ),
+                            getSignalQualityWidget(item['signal']),
                           ],
                         ),
                       ),
@@ -321,5 +328,39 @@ class _HistoryScreenState extends State<HistoryScreen> {
         ],
       ),
     );
+  }
+
+  Widget getSignalQualityWidget(double signalStrength) {
+    if (signalStrength > -50) {
+      return const Row(
+        children: [
+          Text(
+            'Great',
+            style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.green),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      );
+    } else if (signalStrength > -80) {
+      return const Row(
+        children: [
+          Text(
+            'Good',
+            style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.orange),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      );
+    } else {
+      return const Row(
+        children: [
+          Text(
+            'Bad',
+            style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.red),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      );
+    }
   }
 }

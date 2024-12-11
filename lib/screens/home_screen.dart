@@ -102,7 +102,7 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             SizedBox(
               width: 300,
-              height: 300,
+              height: 250,
               child: SfRadialGauge(
                 axes: <RadialAxis>[
                   RadialAxis(
@@ -175,9 +175,18 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ],
         ),
-        const SizedBox(height: 30),
+        const SizedBox(height: 10),
 
         // Network Informations Section
+        const Text(
+          'Network Informations',
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: Colors.black,
+          ),
+        ),
+        const SizedBox(height: 10),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
@@ -268,8 +277,8 @@ class _HomeScreenState extends State<HomeScreen> {
         alignment: Alignment.center,
         children: [
           SizedBox(
-            width: 200,
-            height: 200,
+            width: 250,
+            height: 150,
             child:
               NetworkGauge(
                 downloadValue: networkProvider.downloadSpeed,
@@ -323,7 +332,7 @@ class _HomeScreenState extends State<HomeScreen> {
               networkProvider.networkType == networkProvider.wifiName
                   ? 'assets/icons/wifi.png'
                   : 'assets/icons/signal.png',
-              width: 30, // Ajustez la largeur de l'image si nécessaire
+              width: 20, // Ajustez la largeur de l'image si nécessaire
               height: 20, // Ajustez la hauteur de l'image si nécessaire
             ),
             label: 'Technologie',
@@ -332,8 +341,8 @@ class _HomeScreenState extends State<HomeScreen> {
           _buildNetworkCard(
             icon: Image.asset(
               'assets/icons/glob.png',
-              width: 30,
-              height: 30,
+              width: 20,
+              height: 20,
             ),
             label: 'Opérateur',
             value: networkProvider.operator ?? '',
@@ -341,15 +350,15 @@ class _HomeScreenState extends State<HomeScreen> {
           _buildNetworkCard(
             icon: Image.asset(
               'assets/icons/loc.png',
-              width: 30,
-              height: 30,
+              width: 20,
+              height: 20,
             ),
             label: 'Location',
             value: networkProvider.location ?? '',
           ),
         ],
       ),
-      const SizedBox(height: 5),
+      const SizedBox(height: 20),
 
       // Stop Test Button
       ElevatedButton(
@@ -403,7 +412,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return Expanded(
       child: Container(
         width:120,
-        height:120,
+        height:150,
         margin: const EdgeInsets.symmetric(horizontal: 5), // Espacement entre les cartes
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
