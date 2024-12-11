@@ -2,7 +2,10 @@ import 'dart:math';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
 import 'dart:convert';
+
+import '../services/network_provider.dart';
 
 class SearchScreen extends StatefulWidget {
   const SearchScreen({super.key});
@@ -16,6 +19,7 @@ class _SearchScreenState extends State<SearchScreen> {
   String _selectedIndicator = 'Download';
   Map<String, dynamic>? _chartData;
   bool _isLoading = false;
+  
 
   final Map<String, String> indicatorMapping = {
     'Download': 'downloadSpeed',
@@ -35,7 +39,6 @@ class _SearchScreenState extends State<SearchScreen> {
         body: jsonEncode({
           'technology': _selectedTechnology,
           'indicator': indicatorMapping[_selectedIndicator]!,
-          
         }),
       );
 
@@ -65,8 +68,10 @@ class _SearchScreenState extends State<SearchScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final networkProvider = Provider.of<NetworkProvider>(context, listen: false);
+
     return Scaffold(
-      backgroundColor: Colors.grey[200],
+      backgroundColor: Colors.grey[100],
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -141,14 +146,14 @@ class _SearchScreenState extends State<SearchScreen> {
                 child: _isLoading
                     ? const Center(child: CircularProgressIndicator())
                     : _chartData != null
-                        ? _buildVerticalBarChart()
+                        ? _buildHorizontalBarChart()
                         : const Center(
                             child: Text('No data available'),
                           ),
               ),
 
               // Banner
-              const SizedBox(height: 24),
+              const SizedBox(height: 14),
               Center(
                 child: Image.asset(
                   'assets/images/Capture.png', // Remplacez par le chemin de votre image
@@ -158,21 +163,17 @@ class _SearchScreenState extends State<SearchScreen> {
               ),
 
               // Location Section
-              const SizedBox(height: 24),
-              const Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.location_on, color: Colors.blue),
-                  SizedBox(width: 8),
-                  Text(
-                    'Tevrek Zeyna - Soukouk', // Replace with your location
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-              ),
+              const SizedBox(height: 14),
+              _buildNetworkCarde(
+  icon: Image.asset(
+    'assets/icons/loc.png',
+    width: 24, // Increased for better visibility
+    height: 24,
+  ),
+  label: 'Location',
+  value: networkProvider.location ?? '', // Provide fallback location
+),
+
             ],
           ),
         ),
@@ -212,113 +213,174 @@ class _SearchScreenState extends State<SearchScreen> {
     );
   }
 
- Widget _buildVerticalBarChart() {
+Widget _buildHorizontalBarChart() {
   final operators = _chartData?['group_by_operator']?['buckets'] ?? [];
-  final List<BarChartGroupData> barGroups = [];
 
-  // Trouver la valeur maximale pour l'échelle du graphe
-  double maxValue = 0.0;
+  // Calcul du total pour les pourcentages relatifs
+  double totalAverage = operators.fold(0.0, (sum, operator) {
+    return sum + (operator['average_indicator']['value']?.toDouble() ?? 0.0);
+  });
 
-  for (int i = 0; i < operators.length; i++) {
-    final operator = operators[i];
-    final double averageValue = operator['average_indicator']['value']?.toDouble() ?? 0.0;
-    maxValue = max(maxValue, averageValue);
-
-    barGroups.add(
-      BarChartGroupData(
-        x: i, // Utilise l'index comme valeur de l'axe des X
-        barRods: [
-          BarChartRodData(
-            toY: averageValue, // Valeur de l'indicateur sur l'axe des Y
-            color: _getBarColor(i),
-            width: 20,
-            borderRadius: BorderRadius.circular(4),
-          ),
-        ],
-        showingTooltipIndicators: [0],
-      ),
-    );
-  }
-
-  return BarChart(
-    BarChartData(
-      maxY: maxValue, // Ajuste l'échelle maximale
-      barTouchData: BarTouchData(
-        touchTooltipData: BarTouchTooltipData(
-          getTooltipItem: (group, groupIndex, rod, rodIndex) {
-            final operatorName = operators[group.x.toInt()]['key'];
-            return BarTooltipItem(
-              '$operatorName\n',
-              const TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 8,
-                color: Colors.white,
-              ),
-              children: [
-                TextSpan(
-                  text: '${rod.toY.toStringAsFixed(2)}%',
-                  style: const TextStyle(fontSize: 10, color: Colors.white),
-                ),
-              ],
-            );
-          },
-        ),
-      ),
-     titlesData: FlTitlesData(
-  leftTitles: AxisTitles(
-    sideTitles: SideTitles(
-      showTitles: true,
-      reservedSize: 40,
-      getTitlesWidget: (double value, TitleMeta meta) {
-        return Text(
-          '${value.toStringAsFixed(0)}%', // Show percentages
-          style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
-        );
-      },
-    ),
-  ),
-  bottomTitles: AxisTitles(
-    sideTitles: SideTitles(
-      showTitles: true,
-      reservedSize: 60, // Space for operator names
-      getTitlesWidget: (double value, TitleMeta meta) {
-        final index = value.toInt();
-        if (index < operators.length) {
-          return SideTitleWidget(
-            axisSide: meta.axisSide,
-            space: 4.0,
-            child: Text(
-              operators[index]['key'],
-              style: const TextStyle(
-                fontSize: 10, // Smaller font size
-                fontWeight: FontWeight.bold,
-              ),
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      // Affichage des graduations de 0% à 100%
+      LayoutBuilder(
+        builder: (context, constraints) {
+          final maxWidth = constraints.maxWidth; // Largeur maximale disponible
+          return Padding(
+            padding: const EdgeInsets.only(left: 102.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: List.generate(5, (index) {
+                final label = '${index * 25}%';
+                return Text(
+                  label,
+                  style: const TextStyle(fontSize: 12, color: Colors.grey),
+                );
+              }),
             ),
           );
-        }
-        return const SizedBox();
-      },
-    ),
-  ),
-  topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-  rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-),
-      gridData: const FlGridData(show: true),
-      borderData: FlBorderData(show: false),
-      barGroups: barGroups,
-      alignment: BarChartAlignment.spaceAround,
-      groupsSpace: 16, // Espacement entre les barres
-    ),
+        },
+      ),
+      const SizedBox(height: 8),
+      // Génération dynamique des barres horizontales
+      ...operators.map((operator) {
+        final averageValue = operator['average_indicator']['value']?.toDouble() ?? 0.0;
+        final percentage = totalAverage > 0 ? (averageValue / totalAverage) * 100 : 0.0;
+        final normalizedWidth = (percentage / 100).clamp(0.0, 1.0); // Clamp pour éviter les dépassements
+        final operatorName = operator['key'];
+
+        return Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              // Nom de l'opérateur
+              SizedBox(
+                width: 100,
+                child: Text(
+                  operatorName,
+                  style: const TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              // Barre horizontale avec couleurs
+              Expanded(
+                child: Stack(
+                  children: [
+                    // Fond gris
+                    Container(
+                      height: 10,
+                      decoration: BoxDecoration(
+                        color: Colors.grey[200],
+                        borderRadius: BorderRadius.circular(1),
+                      ),
+                    ),
+                    // Portion colorée
+                    FractionallySizedBox(
+                      widthFactor: normalizedWidth, // Largeur en fonction du pourcentage
+                      child: Container(
+                        height: 10,
+                        decoration: BoxDecoration(
+                          color: _getBarColor(operators.indexOf(operator)),
+                          borderRadius: BorderRadius.circular(1),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 8),
+              // Pourcentage aligné à droite
+              Text(
+                '${percentage.toStringAsFixed(0)}%',
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                  color: _getBarColor(operators.indexOf(operator)),
+                ),
+              ),
+            ],
+          ),
+        );
+      }).toList(),
+    ],
   );
 }
 
-  Color _getBarColor(int index) {
-    const List<Color> colors = [
-      Color(0xff63C2FF), // Chingutel
-      Color(0xff4CBD7F), // Rimatel
-      Color(0xffFFB946), // Mauritel
-      Color(0xff5085F6), // Mattel
-    ];
-    return colors[index % colors.length];
+
+// Fonction pour définir des couleurs différentes pour chaque barre
+Color _getBarColor(int index) {
+  switch (index) {
+    case 0: // Chinguitel
+      return const Color(0xFF9370DB);
+    case 1: // Rimatel
+      return const Color(0xFF00CED1);
+    case 2: // Mauritel
+      return const Color(0xFFFFD700);
+    case 3: // Mattel
+      return const Color(0xFF1E90FF);
+    default:
+      return Colors.grey;
   }
+
+}
+}
+
+  Widget _buildNetworkCarde({
+  required Widget icon,
+  required String label,
+  required String value,
+}) {
+  return Center(
+    child: Expanded(
+      child: Container(
+        width: 160, // Largeur de la carte
+        height: 120, // Hauteur de la carte
+        margin: const EdgeInsets.symmetric(horizontal: 8), // Espacement entre les cartes
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.2),
+              spreadRadius: 2,
+              blurRadius: 5,
+              offset: const Offset(0, 3),
+            ),
+          ],
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            icon,
+            const SizedBox(height: 8),
+            Text(
+              label,
+              style: const TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.bold,
+                color: Colors.grey,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              value,
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      ),
+    ),
+  );
 }
