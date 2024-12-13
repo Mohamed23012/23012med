@@ -36,6 +36,7 @@ class NetworkProvider with ChangeNotifier {
   double? _lon = 0;
   String? _device = '---';
   String? _signalStrengthValue = null;
+  String? _signalStrengthValuee = null;
   static String? comment = null;
 // Variable to store ISP information
   bool isTesting = false; // Track whether the test is running
@@ -56,6 +57,7 @@ class NetworkProvider with ChangeNotifier {
   String? get operator => _operator;
   String? get location => _location;
   String? get signalStrengthValue => _signalStrengthValue;
+  String? get signalStrengthValuee => _signalStrengthValuee;
   String? get wifiName => _wifiName;
 
   bool _isCancelled = false;
@@ -390,12 +392,16 @@ Future<void> fetchOperatorInfo() async {
   try {
     // Retrieve operator name
     final operatorName = await telephony.simOperatorName;
+     final signalStrength = await telephony.signalStrengths;
 
+      _signalStrengthValue = signalStrength.isNotEmpty
+          ? signalStrength[0].toString().split('.').last
+          : 'Unknown';
     // Fetch mobile and WiFi signal strengths
     final int? mobileSignal = await internetSignal.getMobileSignalStrength();
     final int? wifiSignal = await internetSignal.getWifiSignalStrength();
 
-    _signalStrengthValue = mobileSignal != null
+    _signalStrengthValuee = mobileSignal != null
         ? '$mobileSignal dBm'
         : (wifiSignal != null ? '$wifiSignal dBm' : 'Unknown');
 

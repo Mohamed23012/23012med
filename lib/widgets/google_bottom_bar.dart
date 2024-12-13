@@ -18,8 +18,11 @@ class _GoogleBottomBarState extends State<GoogleBottomBar> {
   final List<Widget> _screens = [
     const HomeScreen(key: PageStorageKey('HomeScreen')),
     const ComplaintsScreen(key: PageStorageKey('ComplaintsScreen')),
-    const HistoryScreen(key: PageStorageKey('HistoryScreen')),
     const SearchScreen(key: PageStorageKey('SearchScreen')),
+    const HistoryScreen(key: PageStorageKey('HistoryScreen')),
+    // SearchScreen(),
+    
+
   ];
 
   @override
@@ -80,16 +83,17 @@ class _GoogleBottomBarState extends State<GoogleBottomBar> {
                     ),
                     BottomNavigationBarItem(
                       icon: ImageIcon(
-                        AssetImage('assets/icons/history.png'),
-                      ),
-                      label: "History",
-                    ),
-                    BottomNavigationBarItem(
-                      icon: ImageIcon(
                         AssetImage('assets/icons/star.png'),
                       ),
                       label: "Search",
                     ),
+                    BottomNavigationBarItem(
+                      icon: ImageIcon(
+                        AssetImage('assets/icons/history.png'),
+                      ),
+                      label: "History",
+                    ),
+                    
                   ],
                 ),
               ),

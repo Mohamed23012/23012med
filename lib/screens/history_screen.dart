@@ -56,18 +56,19 @@ class _HistoryScreenState extends State<HistoryScreen> {
 
           final timestamp = sort[0] ?? 'Unknown timestamp';
           final downloadSpeed = source['downloadSpeed']?.toString() ?? '0.0';
-          final signalStrengthValue = source['signalStrengthValue']?.toString() ?? '0';
+          final signalStrengthValuee = source['signalStrengthValuee']?.toString() ?? '0';
+          print(signalStrengthValuee);
           final networkType = source['networkType'] ?? '';
 
           loadedData.add({
             'timestamp': timestamp,
             'download': downloadSpeed,
-            'signal': double.parse(signalStrengthValue.replaceAll(" dBm", "")),
+            'signal': double.parse(signalStrengthValuee.replaceAll(" dBm", "")),
             'technology': networkType,
           });
 
           totalDownload += double.tryParse(downloadSpeed) ?? 0.0;
-          totalSignal += double.parse(signalStrengthValue.replaceAll(" dBm", ""));
+          totalSignal += double.parse(signalStrengthValuee.replaceAll(" dBm", ""));
         }
 
         setState(() {
@@ -213,12 +214,12 @@ class _HistoryScreenState extends State<HistoryScreen> {
                     final item = filteredData[index];
                     return GestureDetector(
                       onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => SpeedTestFinishedPage(),
-                          ),
-                        );
+                        // Navigator.push(
+                        //   context,
+                        //   MaterialPageRoute(
+                        //     builder: (context) => SpeedTestFinishedPage(),
+                        //   ),
+                        // );
                       },
                       child: Container(
                         width: 100,

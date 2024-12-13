@@ -199,7 +199,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 height: 20,
               ),
               label: 'Technologie',
-              value: networkProvider.networkType ?? 'N/A',
+              value: networkProvider.networkType ?? '',
             ),
             _buildNetworkCard(
               icon: Image.asset(
@@ -208,7 +208,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 height: 20,
               ),
               label: 'Operateur',
-              value: networkProvider.operator ?? 'N/A',
+              value: networkProvider.operator ?? '',
             ),
             _buildNetworkCard(
               icon: Image.asset(
@@ -217,7 +217,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 height: 20,
               ),
               label: 'Location',
-              value: networkProvider.location ?? 'N/A',
+              value: networkProvider.location ?? '',
             ),
           ],
         ),
