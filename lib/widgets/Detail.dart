@@ -64,7 +64,7 @@ class DetailsScreen extends StatelessWidget {
                 ),
                 _buildSpeedCard(
                   label: 'Signal',
-                  value: '${result['signal']}',
+                  value: '${result['signale']}',
                   iconPath: 'assets/icons/signal_rate.png',
                   isLarge: true,
                 ),
@@ -78,17 +78,17 @@ class DetailsScreen extends StatelessWidget {
               children: [
                 _buildSpeedCard(
                   label: 'Ping',
-                  value: '${result['ping']} ms',
+                  value: '${double.parse(result['ping'].toString()).toStringAsFixed(2)} ms',
                   iconPath: 'assets/icons/ping.png',
                 ),
                 _buildSpeedCard(
                   label: 'Jitter',
-                  value: '${result['jitter']} ms',
+                  value: '${double.parse(result['jitter'].toString()).toStringAsFixed(2)} ms',
                   iconPath: 'assets/icons/jitter.png',
                 ),
                 _buildSpeedCard(
                   label: 'Upload',
-                  value: '${result['upload']} Mbps',
+                  value: '${double.parse(result['upload'].toString()).toStringAsFixed(2)} Mbps',
                   iconPath: 'assets/icons/up.png',
                 ),
               ],
@@ -157,7 +157,7 @@ class DetailsScreen extends StatelessWidget {
                     height: 20,
                   ),
                   label: 'Location',
-                  value: result['location'] ?? '',
+                  value: result['place'] ?? '',
                 ),
               ],
             ),
@@ -229,7 +229,7 @@ class DetailsScreen extends StatelessWidget {
   }) {
     return Expanded(
       child: Container(
-        height: 80,
+        height: 150,
         margin: const EdgeInsets.symmetric(horizontal: 2),
         padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(

@@ -69,6 +69,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
             'timestamp': timestamp,
             'download': downloadSpeed,
             'signal': double.parse(signalStrengthValuee.replaceAll(" dBm", "")),
+            'signale' : signalStrengthValuee,
             'upload': uploadSpeed,
             'ping': ping,
             'jitter': jitter,

@@ -19,10 +19,8 @@ class _SearchScreenState extends State<SearchScreen> {
   String _selectedIndicator = 'Download';
   Map<String, dynamic>? _chartData;
   bool _isLoading = false;
-
-  final Map<String, Color> _operatorColors = {};
-  final List<Color> _colorPalette = [];
   
+
   final Map<String, String> indicatorMapping = {
     'Download': 'downloadSpeed',
     'Upload': 'uploadSpeed',
@@ -73,7 +71,7 @@ class _SearchScreenState extends State<SearchScreen> {
     final networkProvider = Provider.of<NetworkProvider>(context, listen: false);
 
     return Scaffold(
-      backgroundColor: Colors.grey[200],
+      backgroundColor: Colors.grey[100],
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -167,14 +165,15 @@ class _SearchScreenState extends State<SearchScreen> {
               // Location Section
               const SizedBox(height: 14),
               _buildNetworkCarde(
-                icon: Image.asset(
-                  'assets/icons/loc.png',
-                  width: 24, // Increased for better visibility
-                  height: 24,
-                ),
-                label: 'Location',
-                value: networkProvider.location ?? '', // Provide fallback location
-              ),
+  icon: Image.asset(
+    'assets/icons/loc.png',
+    width: 24, // Increased for better visibility
+    height: 24,
+  ),
+  label: 'Location',
+  value: networkProvider.location ?? '', // Provide fallback location
+),
+
             ],
           ),
         ),
@@ -214,23 +213,23 @@ class _SearchScreenState extends State<SearchScreen> {
     );
   }
 
-  Widget _buildHorizontalBarChart() {
-    final operators = _chartData?['group_by_operator']?['buckets'] ?? [];
+Widget _buildHorizontalBarChart() {
+  final operators = _chartData?['group_by_operator']?['buckets'] ?? [];
 
-    // Calcul du total pour les pourcentages relatifs
-    double totalAverage = operators.fold(0.0, (sum, operator) {
-      return sum + (operator['average_indicator']['value']?.toDouble() ?? 0.0);
-    });
+  // Calcul du total pour les pourcentages relatifs
+  double totalAverage = operators.fold(0.0, (sum, operator) {
+    return sum + (operator['average_indicator']['value']?.toDouble() ?? 0.0);
+  });
 
-    return Column(
+  return SingleChildScrollView( // Ajout d'un scroll vertical
+    child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         // Affichage des graduations de 0% à 100%
         LayoutBuilder(
           builder: (context, constraints) {
-            final maxWidth = constraints.maxWidth; // Largeur maximale disponible
             return Padding(
-              padding: const EdgeInsets.only(left: 102.0),
+              padding: const EdgeInsets.only(left: 93.0),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: List.generate(5, (index) {
@@ -246,20 +245,20 @@ class _SearchScreenState extends State<SearchScreen> {
         ),
         const SizedBox(height: 8),
         // Génération dynamique des barres horizontales
-        ...operators.map((operator) {
+        ...operators.map<Widget>((operator) {
           final averageValue = operator['average_indicator']['value']?.toDouble() ?? 0.0;
           final percentage = totalAverage > 0 ? (averageValue / totalAverage) * 100 : 0.0;
           final normalizedWidth = (percentage / 100).clamp(0.0, 1.0); // Clamp pour éviter les dépassements
           final operatorName = operator['key'];
 
           return Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+            padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 4.0),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 // Nom de l'opérateur
                 SizedBox(
-                  width: 100,
+                  width: 90,
                   child: Text(
                     operatorName,
                     style: const TextStyle(
@@ -307,30 +306,64 @@ class _SearchScreenState extends State<SearchScreen> {
               ],
             ),
           );
-        }).toList(),
+        }).toList(), // Conversion explicite en liste de widgets
       ],
-    );
-  }
-  // Generate a random color as a fallback
-  Color _generateRandomColor() {
-    return Color((Random().nextDouble() * 0xFFFFFF).toInt()).withOpacity(1.0);
-  }
-
-Color _getBarColor(String operatorName) {
-    if (_operatorColors.containsKey(operatorName)) {
-      return _operatorColors[operatorName]!;
-    }
-
-    final Color newColor = _colorPalette.length > _operatorColors.length
-        ? _colorPalette[_operatorColors.length]
-        : _generateRandomColor();
-
-    _operatorColors[operatorName] = newColor;
-    return newColor;
-  }
-
+    ),
+  );
 }
 
+// Fonction pour définir des couleurs différentes pour chaque barre
+// Liste globale des couleurs utilisées
+Set<Color> usedColors = {};
+
+Color _getBarColor(int index) {
+  // Liste des couleurs usuelles (sans le jaune)
+  List<Color> usualColors = [
+    Colors.red,
+    Colors.green,
+    Colors.blue,
+    Colors.orange,
+    Colors.purple,
+    Colors.cyan,
+    Colors.indigo,
+    Colors.teal,
+    Colors.pink,
+    Colors.brown,
+  ];
+
+  // Vous pouvez ajouter ici vos autres couleurs spécifiques si besoin
+  Color color;
+
+  // Assure que la couleur n'a pas déjà été utilisée
+  switch (index) {
+    case 0: // Chinguitel
+      color = const Color(0xFF9370DB);
+      break;
+    case 1: // Rimatel
+      color = const Color(0xFF00CED1);
+      break;
+    case 2: // Mauritel
+      color = const Color(0xFFFFD700); // Jaune (c'est l'exception ici)
+      break;
+    case 3: // Mattel
+      color = const Color(0xFF1E90FF);
+      break;
+    default:
+      // Choisir une couleur aléatoire parmi celles définies, en excluant celles déjà utilisées
+      do {
+        color = usualColors[Random().nextInt(usualColors.length)];
+      } while (usedColors.contains(color));
+
+      // Ajouter la couleur à l'ensemble des couleurs utilisées
+      usedColors.add(color);
+      break;
+  }
+
+  return color;
+}
+
+
+}
 Widget _buildNetworkCarde({
   required Widget icon,
   required String label,
