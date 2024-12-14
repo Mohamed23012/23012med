@@ -19,8 +19,10 @@ class _SearchScreenState extends State<SearchScreen> {
   String _selectedIndicator = 'Download';
   Map<String, dynamic>? _chartData;
   bool _isLoading = false;
-  
 
+  final Map<String, Color> _operatorColors = {};
+  final List<Color> _colorPalette = [];
+  
   final Map<String, String> indicatorMapping = {
     'Download': 'downloadSpeed',
     'Upload': 'uploadSpeed',
@@ -165,15 +167,14 @@ class _SearchScreenState extends State<SearchScreen> {
               // Location Section
               const SizedBox(height: 14),
               _buildNetworkCarde(
-  icon: Image.asset(
-    'assets/icons/loc.png',
-    width: 24, // Increased for better visibility
-    height: 24,
-  ),
-  label: 'Location',
-  value: networkProvider.location ?? '', // Provide fallback location
-),
-
+                icon: Image.asset(
+                  'assets/icons/loc.png',
+                  width: 24, // Increased for better visibility
+                  height: 24,
+                ),
+                label: 'Location',
+                value: networkProvider.location ?? '', // Provide fallback location
+              ),
             ],
           ),
         ),
@@ -213,122 +214,123 @@ class _SearchScreenState extends State<SearchScreen> {
     );
   }
 
-Widget _buildHorizontalBarChart() {
-  final operators = _chartData?['group_by_operator']?['buckets'] ?? [];
+  Widget _buildHorizontalBarChart() {
+    final operators = _chartData?['group_by_operator']?['buckets'] ?? [];
 
-  // Calcul du total pour les pourcentages relatifs
-  double totalAverage = operators.fold(0.0, (sum, operator) {
-    return sum + (operator['average_indicator']['value']?.toDouble() ?? 0.0);
-  });
+    // Calcul du total pour les pourcentages relatifs
+    double totalAverage = operators.fold(0.0, (sum, operator) {
+      return sum + (operator['average_indicator']['value']?.toDouble() ?? 0.0);
+    });
 
-  return Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      // Affichage des graduations de 0% à 100%
-      LayoutBuilder(
-        builder: (context, constraints) {
-          final maxWidth = constraints.maxWidth; // Largeur maximale disponible
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Affichage des graduations de 0% à 100%
+        LayoutBuilder(
+          builder: (context, constraints) {
+            final maxWidth = constraints.maxWidth; // Largeur maximale disponible
+            return Padding(
+              padding: const EdgeInsets.only(left: 102.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: List.generate(5, (index) {
+                  final label = '${index * 25}%';
+                  return Text(
+                    label,
+                    style: const TextStyle(fontSize: 12, color: Colors.grey),
+                  );
+                }),
+              ),
+            );
+          },
+        ),
+        const SizedBox(height: 8),
+        // Génération dynamique des barres horizontales
+        ...operators.map((operator) {
+          final averageValue = operator['average_indicator']['value']?.toDouble() ?? 0.0;
+          final percentage = totalAverage > 0 ? (averageValue / totalAverage) * 100 : 0.0;
+          final normalizedWidth = (percentage / 100).clamp(0.0, 1.0); // Clamp pour éviter les dépassements
+          final operatorName = operator['key'];
+
           return Padding(
-            padding: const EdgeInsets.only(left: 102.0),
+            padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: List.generate(5, (index) {
-                final label = '${index * 25}%';
-                return Text(
-                  label,
-                  style: const TextStyle(fontSize: 12, color: Colors.grey),
-                );
-              }),
-            ),
-          );
-        },
-      ),
-      const SizedBox(height: 8),
-      // Génération dynamique des barres horizontales
-      ...operators.map((operator) {
-        final averageValue = operator['average_indicator']['value']?.toDouble() ?? 0.0;
-        final percentage = totalAverage > 0 ? (averageValue / totalAverage) * 100 : 0.0;
-        final normalizedWidth = (percentage / 100).clamp(0.0, 1.0); // Clamp pour éviter les dépassements
-        final operatorName = operator['key'];
-
-        return Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              // Nom de l'opérateur
-              SizedBox(
-                width: 100,
-                child: Text(
-                  operatorName,
-                  style: const TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                // Nom de l'opérateur
+                SizedBox(
+                  width: 100,
+                  child: Text(
+                    operatorName,
+                    style: const TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
-              ),
-              // Barre horizontale avec couleurs
-              Expanded(
-                child: Stack(
-                  children: [
-                    // Fond gris
-                    Container(
-                      height: 10,
-                      decoration: BoxDecoration(
-                        color: Colors.grey[200],
-                        borderRadius: BorderRadius.circular(1),
-                      ),
-                    ),
-                    // Portion colorée
-                    FractionallySizedBox(
-                      widthFactor: normalizedWidth, // Largeur en fonction du pourcentage
-                      child: Container(
+                // Barre horizontale avec couleurs
+                Expanded(
+                  child: Stack(
+                    children: [
+                      // Fond gris
+                      Container(
                         height: 10,
                         decoration: BoxDecoration(
-                          color: _getBarColor(operators.indexOf(operator)),
+                          color: Colors.grey[200],
                           borderRadius: BorderRadius.circular(1),
                         ),
                       ),
-                    ),
-                  ],
+                      // Portion colorée
+                      FractionallySizedBox(
+                        widthFactor: normalizedWidth, // Largeur en fonction du pourcentage
+                        child: Container(
+                          height: 10,
+                          decoration: BoxDecoration(
+                            color: _getBarColor(operators.indexOf(operator)),
+                            borderRadius: BorderRadius.circular(1),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              const SizedBox(width: 8),
-              // Pourcentage aligné à droite
-              Text(
-                '${percentage.toStringAsFixed(0)}%',
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.bold,
-                  color: _getBarColor(operators.indexOf(operator)),
+                const SizedBox(width: 8),
+                // Pourcentage aligné à droite
+                Text(
+                  '${percentage.toStringAsFixed(0)}%',
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                    color: _getBarColor(operators.indexOf(operator)),
+                  ),
                 ),
-              ),
-            ],
-          ),
-        );
-      }).toList(),
-    ],
-  );
-}
+              ],
+            ),
+          );
+        }).toList(),
+      ],
+    );
+  }
+  // Generate a random color as a fallback
+  Color _generateRandomColor() {
+    return Color((Random().nextDouble() * 0xFFFFFF).toInt()).withOpacity(1.0);
+  }
 
+Color _getBarColor(String operatorName) {
+    if (_operatorColors.containsKey(operatorName)) {
+      return _operatorColors[operatorName]!;
+    }
 
-// Fonction pour définir des couleurs différentes pour chaque barre
-Color _getBarColor(int index) {
-  switch (index) {
-    case 0: // Chinguitel
-      return const Color(0xFF9370DB);
-    case 1: // Rimatel
-      return const Color(0xFF00CED1);
-    case 2: // Mauritel
-      return const Color(0xFFFFD700);
-    case 3: // Mattel
-      return const Color(0xFF1E90FF);
-    default:
-      return Colors.grey;
+    final Color newColor = _colorPalette.length > _operatorColors.length
+        ? _colorPalette[_operatorColors.length]
+        : _generateRandomColor();
+
+    _operatorColors[operatorName] = newColor;
+    return newColor;
   }
 
 }
-}
+
 Widget _buildNetworkCarde({
   required Widget icon,
   required String label,
