@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-//import 'package:internet/screens/TestFinished.dart';
+import 'package:internet/widgets/Detail.dart';
 import 'package:internet/services/network_provider.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
@@ -214,12 +214,12 @@ class _HistoryScreenState extends State<HistoryScreen> {
                     final item = filteredData[index];
                     return GestureDetector(
                       onTap: () {
-                        // Navigator.push(
-                        //   context,
-                        //   MaterialPageRoute(
-                        //     builder: (context) => SpeedTestFinishedPage(),
-                        //   ),
-                        // );
+                        Navigator.push(
+                         context,
+                         MaterialPageRoute(
+                          builder: (context) => DetailsScreen(result: item),
+                         )
+                        );
                       },
                       child: Container(
                         width: 100,
