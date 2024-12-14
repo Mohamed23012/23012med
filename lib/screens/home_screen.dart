@@ -134,6 +134,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   await networkProvider.fetchOperatorInfo();
                   await networkProvider.networkmetrics();
                   await networkProvider.startTest();
+                  await networkProvider.getAndroidInfo();
                   networkProvider.storeDataTest();
 
                   // Navigate to the "Test Finished" page after completing the test
