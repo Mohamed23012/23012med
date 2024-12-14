@@ -221,113 +221,148 @@ Widget _buildHorizontalBarChart() {
     return sum + (operator['average_indicator']['value']?.toDouble() ?? 0.0);
   });
 
-  return Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      // Affichage des graduations de 0% à 100%
-      LayoutBuilder(
-        builder: (context, constraints) {
-          final maxWidth = constraints.maxWidth; // Largeur maximale disponible
-          return Padding(
-            padding: const EdgeInsets.only(left: 102.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: List.generate(5, (index) {
-                final label = '${index * 25}%';
-                return Text(
-                  label,
-                  style: const TextStyle(fontSize: 12, color: Colors.grey),
-                );
-              }),
-            ),
-          );
-        },
-      ),
-      const SizedBox(height: 8),
-      // Génération dynamique des barres horizontales
-      ...operators.map((operator) {
-        final averageValue = operator['average_indicator']['value']?.toDouble() ?? 0.0;
-        final percentage = totalAverage > 0 ? (averageValue / totalAverage) * 100 : 0.0;
-        final normalizedWidth = (percentage / 100).clamp(0.0, 1.0); // Clamp pour éviter les dépassements
-        final operatorName = operator['key'];
+  return SingleChildScrollView( // Ajout d'un scroll vertical
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Affichage des graduations de 0% à 100%
+        LayoutBuilder(
+          builder: (context, constraints) {
+            return Padding(
+              padding: const EdgeInsets.only(left: 93.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: List.generate(5, (index) {
+                  final label = '${index * 25}%';
+                  return Text(
+                    label,
+                    style: const TextStyle(fontSize: 12, color: Colors.grey),
+                  );
+                }),
+              ),
+            );
+          },
+        ),
+        const SizedBox(height: 8),
+        // Génération dynamique des barres horizontales
+        ...operators.map<Widget>((operator) {
+          final averageValue = operator['average_indicator']['value']?.toDouble() ?? 0.0;
+          final percentage = totalAverage > 0 ? (averageValue / totalAverage) * 100 : 0.0;
+          final normalizedWidth = (percentage / 100).clamp(0.0, 1.0); // Clamp pour éviter les dépassements
+          final operatorName = operator['key'];
 
-        return Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              // Nom de l'opérateur
-              SizedBox(
-                width: 100,
-                child: Text(
-                  operatorName,
-                  style: const TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
+          return Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 4.0),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                // Nom de l'opérateur
+                SizedBox(
+                  width: 90,
+                  child: Text(
+                    operatorName,
+                    style: const TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
-              ),
-              // Barre horizontale avec couleurs
-              Expanded(
-                child: Stack(
-                  children: [
-                    // Fond gris
-                    Container(
-                      height: 10,
-                      decoration: BoxDecoration(
-                        color: Colors.grey[200],
-                        borderRadius: BorderRadius.circular(1),
-                      ),
-                    ),
-                    // Portion colorée
-                    FractionallySizedBox(
-                      widthFactor: normalizedWidth, // Largeur en fonction du pourcentage
-                      child: Container(
+                // Barre horizontale avec couleurs
+                Expanded(
+                  child: Stack(
+                    children: [
+                      // Fond gris
+                      Container(
                         height: 10,
                         decoration: BoxDecoration(
-                          color: _getBarColor(operators.indexOf(operator)),
+                          color: Colors.grey[200],
                           borderRadius: BorderRadius.circular(1),
                         ),
                       ),
-                    ),
-                  ],
+                      // Portion colorée
+                      FractionallySizedBox(
+                        widthFactor: normalizedWidth, // Largeur en fonction du pourcentage
+                        child: Container(
+                          height: 10,
+                          decoration: BoxDecoration(
+                            color: _getBarColor(operators.indexOf(operator)),
+                            borderRadius: BorderRadius.circular(1),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              const SizedBox(width: 8),
-              // Pourcentage aligné à droite
-              Text(
-                '${percentage.toStringAsFixed(0)}%',
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.bold,
-                  color: _getBarColor(operators.indexOf(operator)),
+                const SizedBox(width: 8),
+                // Pourcentage aligné à droite
+                Text(
+                  '${percentage.toStringAsFixed(0)}%',
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                    color: _getBarColor(operators.indexOf(operator)),
+                  ),
                 ),
-              ),
-            ],
-          ),
-        );
-      }).toList(),
-    ],
+              ],
+            ),
+          );
+        }).toList(), // Conversion explicite en liste de widgets
+      ],
+    ),
   );
 }
 
-
 // Fonction pour définir des couleurs différentes pour chaque barre
+// Liste globale des couleurs utilisées
+Set<Color> usedColors = {};
+
 Color _getBarColor(int index) {
+  // Liste des couleurs usuelles (sans le jaune)
+  List<Color> usualColors = [
+    Colors.red,
+    Colors.green,
+    Colors.blue,
+    Colors.orange,
+    Colors.purple,
+    Colors.cyan,
+    Colors.indigo,
+    Colors.teal,
+    Colors.pink,
+    Colors.brown,
+  ];
+
+  // Vous pouvez ajouter ici vos autres couleurs spécifiques si besoin
+  Color color;
+
+  // Assure que la couleur n'a pas déjà été utilisée
   switch (index) {
     case 0: // Chinguitel
-      return const Color(0xFF9370DB);
+      color = const Color(0xFF9370DB);
+      break;
     case 1: // Rimatel
-      return const Color(0xFF00CED1);
+      color = const Color(0xFF00CED1);
+      break;
     case 2: // Mauritel
-      return const Color(0xFFFFD700);
+      color = const Color(0xFFFFD700); // Jaune (c'est l'exception ici)
+      break;
     case 3: // Mattel
-      return const Color(0xFF1E90FF);
+      color = const Color(0xFF1E90FF);
+      break;
     default:
-      return Colors.grey;
+      // Choisir une couleur aléatoire parmi celles définies, en excluant celles déjà utilisées
+      do {
+        color = usualColors[Random().nextInt(usualColors.length)];
+      } while (usedColors.contains(color));
+
+      // Ajouter la couleur à l'ensemble des couleurs utilisées
+      usedColors.add(color);
+      break;
   }
 
+  return color;
 }
+
+
 }
 Widget _buildNetworkCarde({
   required Widget icon,

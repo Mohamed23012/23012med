@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:internet/screens/TestFinished.dart';
+//import 'package:internet/screens/TestFinished.dart';
 import 'package:internet/services/network_provider.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
@@ -57,13 +57,24 @@ class _HistoryScreenState extends State<HistoryScreen> {
           final timestamp = sort[0] ?? 'Unknown timestamp';
           final downloadSpeed = source['downloadSpeed']?.toString() ?? '0.0';
           final signalStrengthValuee = source['signalStrengthValuee']?.toString() ?? '0';
-          print(signalStrengthValuee);
+          final uploadSpeed = source['uploadSpeed']?.toString() ?? '0.0';
+          final ping = source['ping']?.toString() ?? '0.0';
+          final jitter = source['jitter']?.toString() ?? '0.0';
+          final place = source['place'] ?? 'Unknown place';
+          final operator = source['operator'] ?? 'Unknown operator';
+          final device = source['device'] ?? 'Unknown device';
           final networkType = source['networkType'] ?? '';
 
           loadedData.add({
             'timestamp': timestamp,
             'download': downloadSpeed,
             'signal': double.parse(signalStrengthValuee.replaceAll(" dBm", "")),
+            'upload': uploadSpeed,
+            'ping': ping,
+            'jitter': jitter,
+            'place': place,
+            'operator': operator,
+            'device': device,
             'technology': networkType,
           });
 
@@ -84,7 +95,6 @@ class _HistoryScreenState extends State<HistoryScreen> {
       print('Error loading history data: $e');
     }
   }
-
   @override
   Widget build(BuildContext context) {
     final filteredData = _historyData
