@@ -71,7 +71,7 @@ class _SearchScreenState extends State<SearchScreen> {
     final networkProvider = Provider.of<NetworkProvider>(context, listen: false);
 
     return Scaffold(
-      backgroundColor: Colors.grey[100],
+      backgroundColor: Colors.grey[200],
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -336,8 +336,8 @@ Widget _buildNetworkCarde({
 }) {
   return Center(
     child: Container(
-      width: 160,
-      height: 120,
+      width: 200,
+      height: 100,
       margin: const EdgeInsets.symmetric(horizontal: 8),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -353,29 +353,34 @@ Widget _buildNetworkCarde({
         ],
       ),
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          icon,
-          const SizedBox(height: 8),
           Text(
             label,
             style: const TextStyle(
-              fontSize: 12,
+              fontSize: 14,
               fontWeight: FontWeight.bold,
               color: Colors.grey,
             ),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 8),
-          Text(
-            value,
-            style: const TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-              color: Colors.black,
-            ),
-            textAlign: TextAlign.center,
-          ),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              const SizedBox(width: 8),
+              icon,
+              Text(
+                value,
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          )
         ],
       ),
     ),

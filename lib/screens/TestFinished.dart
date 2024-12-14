@@ -49,7 +49,7 @@ class SpeedTestFinishedPage extends StatelessWidget {
                 ),
                 _buildSpeedCard(
                   label: 'Signal',
-                  value: '${networkProvider.signalStrengthValue ?? 'N/A'}',
+                  value: '${networkProvider.signalStrengthValue ?? ''}',
                   iconPath: 'assets/icons/signal_rate.png',
                   isLarge: true, // Larger card
                 ),
@@ -181,8 +181,8 @@ class SpeedTestFinishedPage extends StatelessWidget {
     bool isLarge = false,
   }) {
     return Container(
-      width: isLarge ? 120 : 80,
-      height: isLarge ? 100 : 90,
+      width: isLarge ? 140 : 80,
+      height: isLarge ? 110 : 90,
       padding: const EdgeInsets.all(8.0),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -234,45 +234,50 @@ class SpeedTestFinishedPage extends StatelessWidget {
     required String label,
     required String value,
   }) {
-    return Container(
-      width: 90,
-      height: 120,
-      padding: const EdgeInsets.all(8.0),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(10),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.2),
-            spreadRadius: 2,
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          icon,
-          const SizedBox(height: 8),
-          Text(
-            label,
-            style: const TextStyle(
-              fontSize: 10,
-              color: Colors.grey,
+    return Expanded(
+      child: Container(
+        width:120,
+        height:160,
+        margin: const EdgeInsets.symmetric(horizontal: 5), // Espacement entre les cartes
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.2),
+              spreadRadius: 2,
+              blurRadius: 5,
+              offset: const Offset(0, 3),
             ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            value,
-            style: const TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.bold,
-              color: Colors.black,
+          ],
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            icon,
+            const SizedBox(height: 4),
+            Text(
+              label,
+              style: const TextStyle(
+                fontSize: 10,
+                fontWeight: FontWeight.bold,
+                color: Colors.grey,
+              ),
+              textAlign: TextAlign.center,
             ),
-            textAlign: TextAlign.center,
-          ),
-        ],
+            const SizedBox(height: 4),
+            Text(
+              value,
+              style: const TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
       ),
     );
   }

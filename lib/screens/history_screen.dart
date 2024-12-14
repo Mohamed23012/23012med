@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:internet/screens/TestFinished.dart';
+//import 'package:internet/screens/TestFinished.dart';
 import 'package:internet/services/network_provider.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';

@@ -43,59 +43,38 @@ class _ComplaintsScreenState extends State<ComplaintsScreen> {
   }
 
   void _submitComplaint() async {
-    if (_currentRating > 0 || _complaintController.text.isNotEmpty) {
-      // Afficher un indicateur de chargement
-      showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (context) => const Center(
-          child: CircularProgressIndicator(),
-        ),
-      );
+    // Close the keyboard
+    FocusScope.of(context).unfocus();
 
+    // Check if there's a rating or complaint text
+    if (_currentRating > 0 || _complaintController.text.isNotEmpty) {
       final complaintText = _complaintController.text;
       final complaintRating = _currentRating;
 
-      // Ajouter la plainte localement
+      // Add the complaint locally
       setState(() {
         _complaints.add({
           'date': DateTime.now().toIso8601String(),
           'rating': complaintRating,
           'complaint': complaintText,
         });
-        _complaintController.clear();
-        _currentRating = 0.0;
+        _complaintController.clear(); // Clear the input field
+        _currentRating = 0.0; // Reset the rating
       });
 
-      // Sauvegarder les plaintes localement
+      // Save complaints locally
       await _saveComplaints();
 
+      // Send the complaint data to the backend silently
       final networkProvider = Provider.of<NetworkProvider>(context, listen: false);
-
-      // Envoyer les données de la plainte au backend
       try {
         await networkProvider.storeDataPlaint(
           complaint: complaintText,
           rating: complaintRating,
         );
-
-        Navigator.pop(context); // Fermer le dialogue de chargement
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Complaint submitted successfully!")),
-        );
       } catch (e) {
-        Navigator.pop(context); // Fermer le dialogue de chargement
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Failed to submit complaint: $e")),
-        );
+        // Silently handle the error without any feedback
       }
-    } else {
-      // Afficher une erreur si la plainte ou l'évaluation est vide
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Please provide a rating and enter your complaint."),
-        ),
-      );
     }
   }
 
